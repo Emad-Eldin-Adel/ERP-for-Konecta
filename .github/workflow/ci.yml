@@ -1,0 +1,76 @@
+name: CI/CD Pipeline - Konecta ERP
+
+on:
+  push:
+    branches: [ "dev", "test" ]
+  pull_request:
+    branches: [ "dev", "test" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------
+      # 🧭 Common Setup
+      # ------------------------------
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ------------------------------
+      # 🌐 Frontend (Angular 18)
+      # ------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Angular Frontend
+        working-directory: ./frontend
+        run: npm run build --if-present
+
+      # ------------------------------
+      # ☕ Backend - Java (Spring Boot Microservices)
+      # ------------------------------
+      - name: Set up Java Environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Spring Boot Services
+        working-directory: ./backend/java
+        run: |
+          if [ -f "mvnw" ]; then
+            ./mvnw clean package -DskipTests
+          else
+            mvn clean package -DskipTests
+          fi
+
+      # ------------------------------
+      # 🧱 Backend - .NET (ASP.NET Core Microservices)
+      # ------------------------------
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore .NET Dependencies
+        working-directory: ./backend/dotnet
+        run: dotnet restore
+
+      - name: Build .NET Services
+        working-directory: ./backend/dotnet
+        run: dotnet build --no-restore -c Release
+
+      # ------------------------------
+      # 🧾 Summary
+      # ------------------------------
+      - name: Display Build Summary
+        run: echo "✅ Build completed successfully on branch: ${{ github.ref_name }}"
+
+  
