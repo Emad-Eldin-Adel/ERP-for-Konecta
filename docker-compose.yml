@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  discovery:
+    build: ./backend/discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - konecta-net
+
+  config:
+    build: ./backend/config
+    ports:
+      - "8888:8888"
+    depends_on:
+      - discovery
+    networks:
+      - konecta-net
+
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config
+      - discovery
+    networks:
+      - konecta-net
+
+  auth-service:
+    build: ./backend/auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config
+      - discovery
+    networks:
+      - konecta-net
+
+  user-management:
+    build: ./backend/user-management
+    ports:
+      - "8082:8082"
+    depends_on:
+      - config
+      - discovery
+    networks:
+      - konecta-net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - konecta-net
+
+networks:
+  konecta-net:
+    driver: bridge
