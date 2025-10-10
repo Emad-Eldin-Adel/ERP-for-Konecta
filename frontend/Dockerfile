@@ -1,31 +1,14 @@
-# Multi-stage build
+# Stage 1: Build Angular app
 FROM node:18-alpine AS build
-
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies (including dev dependencies for build)
 RUN npm install
-
-# Copy source code
 COPY . .
+RUN npm run build --prod
 
-# RUN npm run build
-RUN npm run build
-
-
-# Runtime stage
+# Stage 2: Serve built app with Nginx
 FROM nginx:alpine
-
-# Copy built application
 COPY --from=build /app/dist/frontend /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
+# COPY nginx.conf /etc/nginx/conf.d/default.conf   <-- remove or comment this line
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

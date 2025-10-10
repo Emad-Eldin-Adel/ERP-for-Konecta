@@ -4,21 +4,21 @@ services:
   discovery:
     build: ./backend/discovery
     ports:
-      - "8761:8761"
+      - "8083:8083"
     networks:
       - konecta-net
 
   config:
     build: ./backend/config
     ports:
-      - "8888:8888"
+      - "8082:8082"
     depends_on:
       - discovery
     networks:
       - konecta-net
 
   api-gateway:
-    build: ./backend/api-gateway
+    build: ./backend/api-geteway
     ports:
       - "8080:8080"
     depends_on:
@@ -26,6 +26,7 @@ services:
       - discovery
     networks:
       - konecta-net
+
 
   auth-service:
     build: ./backend/auth-service
@@ -40,7 +41,7 @@ services:
   user-management:
     build: ./backend/user-management
     ports:
-      - "8082:8082"
+      - "8084:8084"
     depends_on:
       - config
       - discovery
@@ -55,6 +56,7 @@ services:
       - api-gateway
     networks:
       - konecta-net
+
 
 networks:
   konecta-net:

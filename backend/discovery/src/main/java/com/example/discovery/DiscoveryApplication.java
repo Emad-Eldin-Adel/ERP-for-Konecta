@@ -1,13 +1,13 @@
-package com.example.disccovery;
+package com.example.discovery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DisccoveryApplication {
+public class DiscoveryApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DisccoveryApplication.class, args);
+		SpringApplication.run(DiscoveryApplication.class, args);
 	}
 
 }
