@@ -16,7 +16,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/auth-service-1.0.0.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8081
 
