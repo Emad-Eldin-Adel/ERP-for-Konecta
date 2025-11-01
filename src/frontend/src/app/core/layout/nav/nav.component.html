@@ -1,0 +1,117 @@
+<nav
+  class="fixed inset-x-0 top-0 z-50 grid items-center gap-x-5 px-6 py-3 shadow-sm border-b w-full"
+  [ngClass]="[
+    brandOn ? 'bg-primary-600 text-white nav--brand border-primary-600' : 'bg-white text-slate-900 border-slate-100',
+    role ? 'grid-cols-[auto_minmax(280px,520px)_auto]' : 'grid-cols-[auto_1fr]'
+  ]"
+  aria-label="Global navigation"
+>
+  <div class="flex items-center gap-3">
+    <button *ngIf="role"
+      type="button"
+      class="grid grid-cols-3 grid-rows-3 gap-[3px] rounded-xl bg-white/10 text-white p-1.5 transition hover:bg-white/20"
+      (click)="toggle.emit()"
+      aria-label="Toggle navigation"
+    >
+      <span *ngFor="let _ of launcherDots" class="h-[5px] w-[5px] rounded-[2px] bg-current"></span>
+    </button>
+    <span class="text-2xl font-bold tracking-tight sync-wordmark" [ngClass]="brandOn ? 'text-white' : 'text-primary-600'" aria-label="SYNC">
+      <svg class="sync-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100" fill="currentColor" role="img" aria-label="SYNC">
+        <style>.sync-text{font:700 70px 'Poppins', Arial, sans-serif;}</style>
+        <text x="10" y="76" class="sync-text" style="letter-spacing:-2px">
+          <tspan>S</tspan>
+            <tspan dx="3" dy="-2" style="font-size:82px">y</tspan>
+        </text>
+        <g transform="translate(3,18) scale(2)">
+          <path d="M205.3,19.2l-7.589,17.871a7.06,7.06,0,0,1-4.246,3.936,7.054,7.054,0,0,1-4.5,0,7.07,7.07,0,0,1-4.229-3.9l-.037-.085-3-7.068L178.956,23.5l-.025-.056a.543.543,0,0,0-.978.048l-2.746,6.47L170.36,41.378l-5.994-2.543,7.589-17.877a7.053,7.053,0,0,1,12.994,0l3.017,7.107,2.723,6.414,0,.008a.614.614,0,0,0,.042.1l0,.006a.545.545,0,0,0,.964-.031.345.345,0,0,0,.02-.048l2.737-6.448L199.3,16.658Z" transform="translate(-118.027 -11.956)" />
+        </g>
+        <text x="176" y="76" class="sync-text">C</text>
+      </svg>
+    </span>
+  </div>
+
+  <label *ngIf="role" class="relative flex items-center justify-center w-full max-w-xl" for="global-search">
+    <svg
+      class="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        d="M21 21l-4.35-4.35M16 10.5a5.5 5.5 0 11-11 0 5.5 5.5 0 0111 0z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </svg>
+    <input
+      id="global-search"
+      type="search"
+      placeholder="Search for a page"
+      class="w-full rounded-full border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-inner focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
+    />
+  </label>
+
+  <div class="flex items-center justify-end justify-self-end gap-2.5">
+    <!-- Home/Auth quick links (top-right for guests) -->
+    <ng-container *ngIf="!role && (isHomeRoute || isAuthRoute)">
+      <a routerLink="/" class="text-sm font-medium hover:underline underline-offset-4 decoration-2 mr-6" [ngClass]="brandOn ? 'text-white decoration-white' : 'text-slate-900 decoration-slate-900'">Home</a>
+      <a [routerLink]="['/']" fragment="about" class="text-sm font-medium hover:underline underline-offset-4 decoration-2 mr-6" [ngClass]="brandOn ? 'text-white decoration-white' : 'text-slate-900 decoration-slate-900'">About us</a>
+    </ng-container>
+    <!-- Employee primary nav buttons (placeholders) -->
+    <div *ngIf="role === 'EMPLOYEE'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Tasks</button>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</button>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Training</button>
+    </div>
+    <!-- Admin primary nav buttons (placeholders) -->
+    <div *ngIf="role === 'ADMIN'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+      <a routerLink="/admin/users" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Users</a>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Roles</button>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Settings</button>
+    </div>
+    <!-- HR primary nav buttons (placeholders) -->
+    <div *ngIf="role === 'HR'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+      <a routerLink="/hr/users" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Users</a>
+      <a routerLink="/hr/attendance" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Attendance</a>
+      <a routerLink="/hr/leaves" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</a>
+    </div>
+    <!-- Finance primary nav buttons (placeholders) -->
+    <div *ngIf="role === 'FINANCE'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Budgets</button>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Transactions</button>
+      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Invoices</button>
+    </div>
+
+    <!-- Profile menu -->
+    <div class="relative top-nav__profile-wrapper">
+      <button *ngIf="role; else guestActions"
+        type="button"
+        class="flex items-center gap-1 text-white p-0 transition hover:opacity-80"
+        (click)="toggleProfileMenu()"
+        aria-expanded="isProfileMenuOpen"
+      >
+        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white shadow-sm">
+          {{ initials }}
+        </span>
+      </button>
+
+      <div *ngIf="isProfileMenuOpen" class="absolute right-0 z-50 mt-2 w-70 rounded-2xl bg-white text-slate-900 shadow-lg ring-1 ring-black/5">
+        <div class="px-4 py-3 border-b border-slate-200">
+          <p class="text-sm font-medium whitespace-nowrap select-text" style="color:#000 !important" title="{{ email }}">{{ email }}</p>
+        </div>
+        <div class="p-3">
+          <button type="button" (click)="onSignOutClick()" class="w-full rounded-lg bg-primary-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-primary-700">
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guest actions when logged out -->
+    <ng-template #guestActions>
+      <a routerLink="/auth/login" class="text-sm font-medium hover:underline underline-offset-4 decoration-2 mr-6" [ngClass]="brandOn ? 'text-white decoration-white' : 'text-slate-900 decoration-slate-900'">Log in</a>
+    </ng-template>
+  </div>
+</nav>

@@ -1,0 +1,85 @@
+<aside id="primary-navigation"
+    class="relative z-10 flex shrink-0 flex-col border-r border-slate-300 bg-slate-200 text-slate-700 transition-all duration-300 h-full min-h-full"
+    [ngClass]="isOpen ? 'w-64 basis-64' : 'w-16 basis-16'"[attr.aria-expanded]="isOpen">
+    <ul class="flex flex-1 flex-col gap-1 px-2 py-4 overflow-hidden min-h-full">
+        <!-- Guaranteed Dashboard link at the very top -->
+        <li *ngIf="dashPath as dp">
+            <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+                [routerLink]="dp" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                [routerLinkActiveOptions]="{ exact: true }">
+                <span
+                    class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                    <span class="material-symbols-outlined text-[20px]">{{ materialIcon('space_dashboard') }}</span>
+                </span>
+                <span *ngIf="isOpen; else srOnlyDash" class="whitespace-nowrap text-sm font-medium">Dashboard</span>
+                <ng-template #srOnlyDash><span class="sr-only">Dashboard</span></ng-template>
+            </a>
+        </li>
+        <li *ngFor="let item of computedItems; let i = index">
+            <!-- Parent with link (no children) -->
+            <ng-container *ngIf="item.path && !item.children; else nonLinkItem">
+                <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+                    [routerLink]="item.path" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                    [routerLinkActiveOptions]="{ exact: true }">
+                    <span
+                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                        <span class="material-symbols-outlined text-[20px]">
+                            {{ materialIcon(item.icon) }}
+                        </span>
+                    </span>
+                    <span *ngIf="isOpen; else srOnly" class="whitespace-nowrap text-sm font-medium">{{ item.label
+                        }}</span>
+                    <ng-template #srOnly><span class="sr-only">{{ item.label }}</span></ng-template>
+                </a>
+            </ng-container>
+            <!-- Non-link items: either placeholders or groups -->
+            <ng-template #nonLinkItem>
+                <button type="button"
+                    class="group flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+                    (click)="item.children ? toggleGroup(i) : null"
+                    [attr.aria-expanded]="item.children ? isExpanded(i) : null">
+                    <span
+                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                        <span class="material-symbols-outlined text-[20px]">
+                            {{ materialIcon(item.icon) }}
+                        </span>
+                    </span>
+                    <span *ngIf="isOpen; else srOnlyStatic" class="whitespace-nowrap text-sm font-medium">{{ item.label
+                        }}</span>
+                    <ng-template #srOnlyStatic><span class="sr-only">{{ item.label }}</span></ng-template>
+                    <span *ngIf="isOpen && item.children"
+                        class="material-symbols-outlined ml-auto text-[18px] transition-transform"
+                        [ngClass]="{ '-rotate-180': isExpanded(i) }">expand_more</span>
+                </button>
+                <!-- Children -->
+                <ul *ngIf="item.children && isExpanded(i) && isOpen" class="mt-1 ml-11 flex flex-col gap-1">
+                    <li *ngFor="let child of item.children">
+                        <ng-container *ngIf="child.path; else nonLinkChild">
+                            <a class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"
+                                [routerLink]="child.path" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                                [routerLinkActiveOptions]="{ exact: true }">
+                                <span
+                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-slate-700 shadow-sm">
+                                    <span class="material-symbols-outlined text-[18px]">{{ materialIcon(child.icon)
+                                        }}</span>
+                                </span>
+                                <span class="whitespace-nowrap text-sm">{{ child.label }}</span>
+                            </a>
+                        </ng-container>
+                        <ng-template #nonLinkChild>
+                            <button type="button"
+                                class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900">
+                                <span
+                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-slate-700 shadow-sm">
+                                    <span class="material-symbols-outlined text-[18px]">{{ materialIcon(child.icon)
+                                        }}</span>
+                                </span>
+                                <span class="whitespace-nowrap text-sm">{{ child.label }}</span>
+                            </button>
+                        </ng-template>
+                    </li>
+                </ul>
+            </ng-template>
+        </li>
+    </ul>
+</aside>
