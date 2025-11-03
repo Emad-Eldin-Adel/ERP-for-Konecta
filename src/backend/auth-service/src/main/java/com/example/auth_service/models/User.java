@@ -1,10 +1,16 @@
 package com.example.auth_service.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +22,7 @@ import java.time.LocalDateTime;
         @UniqueConstraint(name = "uk_users_username", columnNames = { "username" }),
         @UniqueConstraint(name = "uk_users_email", columnNames = { "email" })
 })
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,4 +69,46 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+    }
+
+    @Override
+    @JsonIgnore
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonLocked() {
+        return this.status == null || this.status != UserStatus.INACTIVE;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isEnabled() {
+        return this.status == null || this.status == UserStatus.ACTIVE;
+    }
 }
