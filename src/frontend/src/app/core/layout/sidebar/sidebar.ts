@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -13,7 +13,17 @@ type NavItem = { label: string; icon: string; path?: string; children?: NavChild
 })
 export class SidebarComponent {
   /** compact vs expanded width */
-  isOpen = true;
+  private _isOpen = true;
+
+  @Input()
+  set isOpen(value: boolean) {
+    this._isOpen = value ?? true;
+  }
+  get isOpen(): boolean {
+    return this._isOpen;
+  }
+
+  @Output() isOpenChange = new EventEmitter<boolean>();
 
   /** top dashboard link */
   dashPath = '/';
@@ -64,6 +74,8 @@ export class SidebarComponent {
   }
 
   toggleSidebar() {
-    this.isOpen = !this.isOpen;
+    const next = !this._isOpen;
+    this._isOpen = next;
+    this.isOpenChange.emit(next);
   }
 }

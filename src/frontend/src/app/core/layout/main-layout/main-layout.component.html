@@ -1,8 +1,14 @@
 <div class="min-h-screen bg-gray-50">
   <app-navbar class="fixed top-0 inset-x-0 z-50 block"></app-navbar>
-  <app-sidebar class="fixed left-0 top-[4.5rem] w-56 h-[calc(100vh-4.5rem)] bg-white border-r border-slate-200 z-40 shadow-sm"></app-sidebar>
+  <app-sidebar
+    class="fixed left-0 top-[4.5rem] h-[calc(100vh-4.5rem)] bg-white border-r border-slate-200 z-40 shadow-sm transition-all"
+    [ngClass]="isSidebarOpen ? 'w-56' : 'w-16'"
+    [isOpen]="isSidebarOpen"
+    (isOpenChange)="onSidebarState($event)"></app-sidebar>
 
-  <main class="flex-1 bg-gray-50 overflow-y-auto transition-all min-h-screen ml-56 pt-[4.5rem]">
+  <main
+    class="flex-1 bg-gray-50 overflow-y-auto transition-all min-h-screen pt-[4.5rem]"
+    [ngClass]="isSidebarOpen ? 'ml-56' : 'ml-16'">
     <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
       <router-outlet></router-outlet>
     </div>

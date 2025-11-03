@@ -11,4 +11,11 @@ import { FooterComponent } from '../footer/footer';
   templateUrl: './main-layout.component.html',
   imports: [CommonModule, RouterOutlet, NavbarComponent, SidebarComponent, FooterComponent],
 })
-export class MainLayoutComponent {}
+export class MainLayoutComponent {
+  isSidebarOpen =
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true;
+
+  onSidebarState(open: boolean) {
+    this.isSidebarOpen = open;
+  }
+}
