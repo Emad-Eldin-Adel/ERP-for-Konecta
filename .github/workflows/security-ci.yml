@@ -3,9 +3,9 @@ name: Security Scan Pipeline
 on:
   workflow_call:
   pull_request:
-    branches: ["main"]
+    branches: ["production"]
   push:
-    branches: ["main"]
+    branches: ["production"]
 
 jobs:
   security-scan:

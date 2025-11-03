@@ -2,9 +2,9 @@ name: CI/CD Pipeline - Konecta ERP (Development Branch)
 
 on:
   push:
-    branches: ["development"]
+    branches: ["production"]
   pull_request:
-    branches: ["development"]
+    branches: ["production"]
 
 env:
   REGISTRY: ghcr.io
