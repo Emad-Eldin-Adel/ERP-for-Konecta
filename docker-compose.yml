@@ -3,61 +3,68 @@ version: '3.8'
 services:
   discovery:
     build: ./backend/discovery
-    ports:
-      - "8083:8083"
-    networks:
-      - konecta-net
+    ports: ["8083:8083"]
+    networks: [konecta-net]
 
   config:
     build: ./backend/config
-    ports:
-      - "8082:8082"
-    depends_on:
-      - discovery
-    networks:
-      - konecta-net
+    ports: ["8082:8082"]
+    depends_on: [discovery]
+    networks: [konecta-net]
 
   api-gateway:
     build: ./backend/api-geteway
-    ports:
-      - "8080:8080"
-    depends_on:
-      - config
-      - discovery
-    networks:
-      - konecta-net
+    ports: ["8080:8080"]
+    depends_on: [config, discovery]
+    networks: [konecta-net]
 
+  # ✨ NEW: Postgres database
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"              # optional: expose for local access (psql, DBeaver)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [konecta-net]
 
   auth-service:
     build: ./backend/auth-service
-    ports:
-      - "8081:8081"
+    ports: ["8081:8081"]
     depends_on:
-      - config
-      - discovery
-    networks:
-      - konecta-net
+      postgres:
+        condition: service_healthy
+      config:
+        condition: service_started
+      discovery:
+        condition: service_started
+    environment:
+    networks: [konecta-net]
 
   user-management:
     build: ./backend/user-management
-    ports:
-      - "8084:8084"
-    depends_on:
-      - config
-      - discovery
-    networks:
-      - konecta-net
+    ports: ["8084:8084"]
+    depends_on: [config, discovery]
+    networks: [konecta-net]
 
   frontend:
     build: ./frontend
-    ports:
-      - "4200:80"
-    depends_on:
-      - api-gateway
-    networks:
-      - konecta-net
-
+    ports: ["4200:80"]
+    depends_on: [api-gateway]
+    networks: [konecta-net]
 
 networks:
   konecta-net:
     driver: bridge
+
+volumes:
+  pgdata:

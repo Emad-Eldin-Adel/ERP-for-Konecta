@@ -5,7 +5,22 @@ spring:
   application:
     name: auth-service
 
+  datasource:
+    url: jdbc:postgresql://postgres:5432/auth_db
+    username: auth_user
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    open-in-view: false
+
 eureka:
   client:
-    serviceUrl:
+    service-url:
       defaultZone: http://discovery:8761/eureka/
