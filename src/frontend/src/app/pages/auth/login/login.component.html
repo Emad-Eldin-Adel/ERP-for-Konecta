@@ -1,0 +1,123 @@
+<section class="w-full">
+  <div class="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 shadow-xl ring-1 ring-primary-100/70 backdrop-blur">
+    <div class="flex items-center gap-3 border-b border-slate-200/70 bg-gradient-to-r from-primary-50 to-white px-6 py-5">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600/10 text-primary-600 shadow-sm">
+        <svg
+          class="h-7 w-7"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="32" cy="22" r="8"></circle>
+          <path d="M22 42c0-5.523 4.477-10 10-10s10 4.477 10 10"></path>
+          <line x1="32" y1="6" x2="32" y2="14"></line>
+          <line x1="48.97" y1="11.03" x2="43.66" y2="16.34"></line>
+          <line x1="57" y1="28" x2="49" y2="28"></line>
+          <line x1="48.97" y1="44.97" x2="43.66" y2="39.66"></line>
+          <line x1="32" y1="58" x2="32" y2="50"></line>
+          <line x1="15.03" y1="44.97" x2="20.34" y2="39.66"></line>
+          <line x1="7" y1="28" x2="15" y2="28"></line>
+          <line x1="15.03" y1="11.03" x2="20.34" y2="16.34"></line>
+        </svg>
+      </span>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.52em] text-slate-500">ERP Suite</p>
+        <p class="text-xl font-bold text-primary-700">Konecta One</p>
+      </div>
+    </div>
+
+    <div class="px-6 pb-8 pt-6">
+      <h1 class="text-3xl font-semibold text-slate-900">Welcome back</h1>
+      <p class="mt-1 text-sm text-slate-500">Sign in to continue orchestrating your workspace.</p>
+
+      <form class="mt-8 space-y-6" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="email">Email</label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-primary-500">
+              <span class="material-symbols-outlined text-[18px]">alternate_email</span>
+            </span>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="you@company.com"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pl-9 text-sm text-slate-900 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-100"
+            />
+          </div>
+          <p *ngIf="f.email.touched && f.email.invalid" class="text-xs font-medium text-red-600">
+            {{ f.email.errors?.['required'] ? 'Email is required' : 'Enter a valid email' }}
+          </p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" for="password">Password</label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-primary-500">
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+            </span>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password"
+              class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pl-9 pr-10 text-sm text-slate-900 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-100"
+            />
+            <button
+              type="button"
+              class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 transition hover:text-primary-600"
+              (click)="showPassword = !showPassword"
+              aria-label="Toggle password visibility"
+            >
+              <span class="material-symbols-outlined text-[20px]">
+                {{ showPassword ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+          <p *ngIf="f.password.touched && f.password.invalid" class="text-xs font-medium text-red-600">
+            {{ f.password.errors?.['required'] ? 'Password is required' : 'Minimum 6 characters' }}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <label class="inline-flex items-center gap-2 font-medium">
+            <input
+              type="checkbox"
+              formControlName="remember"
+              class="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+            />
+            Remember me
+          </label>
+          <a routerLink="/auth/forgot" class="font-medium text-primary-600 transition hover:text-primary-500 hover:underline">
+            Forgot password?
+          </a>
+        </div>
+
+        <div *ngIf="serverError" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-inner">
+          {{ serverError }}
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting || form.invalid"
+          class="group relative w-full overflow-hidden rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span class="absolute inset-0 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 opacity-0 transition group-hover:opacity-100"></span>
+          <span class="relative flex items-center justify-center gap-2">
+            <ng-container *ngIf="!submitting; else submittingTpl">Sign in</ng-container>
+          </span>
+        </button>
+        <ng-template #submittingTpl>
+          <span class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+            Signing in...
+          </span>
+        </ng-template>
+      </form>
+
+    </div>
+  </div>
+</section>

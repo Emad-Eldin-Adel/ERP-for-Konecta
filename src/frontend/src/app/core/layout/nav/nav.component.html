@@ -15,19 +15,58 @@
     >
       <span *ngFor="let _ of launcherDots" class="h-[5px] w-[5px] rounded-[2px] bg-current"></span>
     </button>
-    <span class="text-2xl font-bold tracking-tight sync-wordmark" [ngClass]="brandOn ? 'text-white' : 'text-primary-600'" aria-label="SYNC">
-      <svg class="sync-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100" fill="currentColor" role="img" aria-label="SYNC">
-        <style>.sync-text{font:700 70px 'Poppins', Arial, sans-serif;}</style>
-        <text x="10" y="76" class="sync-text" style="letter-spacing:-2px">
-          <tspan>S</tspan>
-            <tspan dx="3" dy="-2" style="font-size:82px">y</tspan>
-        </text>
-        <g transform="translate(3,18) scale(2)">
-          <path d="M205.3,19.2l-7.589,17.871a7.06,7.06,0,0,1-4.246,3.936,7.054,7.054,0,0,1-4.5,0,7.07,7.07,0,0,1-4.229-3.9l-.037-.085-3-7.068L178.956,23.5l-.025-.056a.543.543,0,0,0-.978.048l-2.746,6.47L170.36,41.378l-5.994-2.543,7.589-17.877a7.053,7.053,0,0,1,12.994,0l3.017,7.107,2.723,6.414,0,.008a.614.614,0,0,0,.042.1l0,.006a.545.545,0,0,0,.964-.031.345.345,0,0,0,.02-.048l2.737-6.448L199.3,16.658Z" transform="translate(-118.027 -11.956)" />
-        </g>
-        <text x="176" y="76" class="sync-text">C</text>
-      </svg>
-    </span>
+    <a
+      routerLink="/"
+      class="group flex items-center gap-3 no-underline transition"
+      [ngClass]="brandOn ? 'text-white' : 'text-primary-600'"
+      aria-label="Konecta One home link"
+    >
+      <span
+        class="flex h-12 w-12 items-center justify-center rounded-2xl border transition-all"
+        [ngClass]="brandOn ? 'border-white/20 bg-white/10 text-lime-200' : 'border-primary-100 bg-primary-50 text-primary-500 shadow-sm group-hover:border-primary-200'"
+      >
+        <svg
+          class="h-8 w-8"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          role="img"
+          aria-hidden="true"
+        >
+          <circle cx="32" cy="22" r="8"></circle>
+          <path d="M22 42c0-5.523 4.477-10 10-10s10 4.477 10 10" fill="none"></path>
+          <line x1="32" y1="6" x2="32" y2="14"></line>
+          <line x1="48.97" y1="11.03" x2="43.66" y2="16.34"></line>
+          <line x1="57" y1="28" x2="49" y2="28"></line>
+          <line x1="48.97" y1="44.97" x2="43.66" y2="39.66"></line>
+          <line x1="32" y1="58" x2="32" y2="50"></line>
+          <line x1="15.03" y1="44.97" x2="20.34" y2="39.66"></line>
+          <line x1="7" y1="28" x2="15" y2="28"></line>
+          <line x1="15.03" y1="11.03" x2="20.34" y2="16.34"></line>
+          <circle cx="32" cy="4" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="53" cy="28" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="32" cy="60" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="11" cy="28" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="48.5" cy="16" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="48.5" cy="40" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="15.5" cy="16" r="3" fill="currentColor" stroke="none"></circle>
+          <circle cx="15.5" cy="40" r="3" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </span>
+      <span class="flex flex-col leading-tight">
+        <span
+          class="text-xs font-semibold uppercase tracking-[0.38em]"
+          [ngClass]="brandOn ? 'text-white/70' : 'text-slate-500'"
+        >
+        </span>
+        <span class="text-2xl font-bold tracking-tight">
+          Konecta One
+        </span>
+      </span>
+    </a>
   </div>
 
   <label *ngIf="role" class="relative flex items-center justify-center w-full max-w-xl" for="global-search">
