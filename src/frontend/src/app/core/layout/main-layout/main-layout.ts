@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../nav/nav';
 import { SidebarComponent } from '../sidebar/sidebar';
@@ -8,6 +9,6 @@ import { FooterComponent } from '../footer/footer';
   selector: 'app-main-layout',
   standalone: true,
   templateUrl: './main-layout.component.html',
-  imports: [RouterOutlet, NavbarComponent, SidebarComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, SidebarComponent, FooterComponent],
 })
 export class MainLayoutComponent {}

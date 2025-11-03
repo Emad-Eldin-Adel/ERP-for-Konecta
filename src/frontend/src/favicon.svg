@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="konectaGradient" x1="12" y1="56" x2="52" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF0080"/>
+      <stop offset="1" stop-color="#5C32FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#0B0326"/>
+  <path fill="url(#konectaGradient)" d="M32 10c-.9 0-1.7.48-2.15 1.26l-12 21A2.5 2.5 0 0 0 20.08 36h8.42l-4.7 11.3a2.5 2.5 0 0 0 2.3 3.45h0.2a2.5 2.5 0 0 0 2.22-1.32L32 40.53l3.47 8.9a2.5 2.5 0 0 0 2.22 1.32h0.2a2.5 2.5 0 0 0 2.3-3.45L35.53 36h8.39a2.5 2.5 0 0 0 2.23-3.74l-12-21A2.5 2.5 0 0 0 32 10Z"/>
+</svg>

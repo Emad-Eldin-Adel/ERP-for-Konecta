@@ -1,9 +1,249 @@
-<section class="p-8 text-center">
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Konecta One ERP</h1>
-    <p class="text-gray-600 text-lg">
-        Streamline your business operations with a modern ERP system.
-    </p>
-    <button class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-        Get Started
-    </button>
-</section>
+<div class="space-y-20">
+    <!-- Hero -->
+    <section
+        class="relative overflow-hidden rounded-3xl border border-primary-100/70 bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 px-10 py-16 text-white shadow-2xl shadow-primary-600/30">
+        <div class="absolute -left-20 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-primary-300/30 blur-2xl"></div>
+
+        <div class="relative grid gap-12 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center">
+            <div class="space-y-8">
+                <div
+                    class="inline-flex items-center gap-3 rounded-full bg-white/10 px-4 py-1 text-sm font-semibold uppercase tracking-[0.34em] text-white/80">
+                    <span class="material-symbols-outlined text-base text-accent-yellow">bolt</span>
+                    Konecta One ERP
+                </div>
+                <h1 class="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+                    Orchestrate every team with a single, intelligent workplace.
+                </h1>
+                <p class="max-w-2xl text-base text-white/80 sm:text-lg">
+                    Empower HR, Finance, and Operations with real-time insights, automated workflows, and a unified
+                    experience designed for modern enterprises.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <a routerLink="/auth/login"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-primary-700 shadow-lg shadow-white/20 transition hover:-translate-y-0.5 hover:bg-accent-yellow hover:text-primary-900">
+                        Launch Console
+                        <span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+                    </a>
+                    <button type="button"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-800/30 transition hover:-translate-y-0.5 hover:bg-white/15">
+                        View Product Tour
+                        <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    </button>
+                </div>
+            </div>
+            <div class="relative hidden h-full min-h-[260px] lg:flex">
+                <div
+                    class="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/80 via-white/40 to-primary-200/30 blur-2xl">
+                </div>
+                <div
+                    class="relative mt-6 flex w-full flex-col gap-4 rounded-3xl border border-white/40 bg-white/90 p-6 shadow-2xl shadow-primary-900/20 backdrop-blur">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Today</p>
+                            <p class="text-2xl font-bold text-primary-700">Executive Dashboard</p>
+                        </div>
+                        <span
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-lg shadow-primary-700/40">
+                            <span class="material-symbols-outlined text-[26px]">insights</span>
+                        </span>
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-2xl border border-primary-100 bg-primary-50/70 p-4">
+                            <p class="text-xs font-medium uppercase text-primary-600">Headcount</p>
+                            <p class="mt-2 text-2xl font-semibold text-primary-800">1,245</p>
+                            <p class="mt-1 text-xs font-medium text-primary-600">+3.2% vs last month</p>
+                        </div>
+                        <div class="rounded-2xl border border-primary-100 bg-primary-50/70 p-4">
+                            <p class="text-xs font-medium uppercase text-primary-600">Revenue</p>
+                            <p class="mt-2 text-2xl font-semibold text-primary-800">$3.8M</p>
+                            <p class="mt-1 text-xs font-medium text-primary-600">+12.7% YoY</p>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-primary-100 bg-white p-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-primary-800">Workflow Automation</h3>
+                            <span
+                                class="rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700">Live</span>
+                        </div>
+                        <ul class="mt-4 space-y-3 text-sm text-primary-700">
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-primary-500">check_circle</span>
+                                Payroll approvals synced
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-primary-500">check_circle</span>
+                                Candidate onboarding tasks triggered
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-primary-500">bolt</span>
+                                Finance insights ready for review
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-3xl text-primary-500">workspace_premium</span>
+                <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">HR</span>
+            </div>
+            <p class="mt-6 text-3xl font-bold text-slate-900">98%</p>
+            <p class="mt-2 text-sm text-slate-500">Employee satisfaction after rolling out unified HR portals.</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-3xl text-primary-500">query_stats</span>
+                <span class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">Finance</span>
+            </div>
+            <p class="mt-6 text-3xl font-bold text-slate-900">35%</p>
+            <p class="mt-2 text-sm text-slate-500">Reduction in monthly close time through automated reconciliations.
+            </p>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-3xl text-primary-500">group_work</span>
+                <span
+                    class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">Operations</span>
+            </div>
+            <p class="mt-6 text-3xl font-bold text-slate-900">4x</p>
+            <p class="mt-2 text-sm text-slate-500">Faster cycle times when teams collaborate on Konecta One workspaces.
+            </p>
+        </article>
+        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <div class="flex items-center justify-between">
+                <span class="material-symbols-outlined text-3xl text-primary-500">encrypted</span>
+                <span
+                    class="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">Security</span>
+            </div>
+            <p class="mt-6 text-3xl font-bold text-slate-900">24/7</p>
+            <p class="mt-2 text-sm text-slate-500">Monitoring with zero-trust architecture and compliance built-in.</p>
+        </article>
+    </section>
+
+    <!-- Feature grid -->
+    <section class="space-y-10">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.42em] text-primary-600">Platform Pillars</p>
+                <h2 class="mt-2 text-3xl font-bold text-slate-900">Built to adapt to every team and deliver outcomes
+                    fast.</h2>
+            </div>
+            <a routerLink="/auth/login"
+                class="inline-flex items-center gap-2 rounded-2xl border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-100">
+                Explore the platform
+                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </a>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+            <article
+                class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-lg shadow-slate-200/80 transition hover:-translate-y-1 hover:border-primary-200">
+                <span
+                    class="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary-100 opacity-60 blur-2xl transition group-hover:opacity-90"></span>
+                <div class="relative flex h-full flex-col gap-4">
+                    <div
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600/10 text-primary-600 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">hub</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900">Unified Data Fabric</h3>
+                    <p class="text-sm text-slate-600">
+                        Connect every data stream securely with contextual controls for each department. Build
+                        dashboards,
+                        approvals, and insights without switching tools.
+                    </p>
+                    <a
+                        class="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:text-primary-500">
+                        Learn more
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </a>
+                </div>
+            </article>
+
+            <article
+                class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-lg shadow-slate-200/80 transition hover:-translate-y-1 hover:border-primary-200">
+                <span
+                    class="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary-100 opacity-60 blur-2xl transition group-hover:opacity-90"></span>
+                <div class="relative flex h-full flex-col gap-4">
+                    <div
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600/10 text-primary-600 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">robot</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900">AI-Assisted Workflows</h3>
+                    <p class="text-sm text-slate-600">
+                        Draft policies, summarize financials, and resolve support cases faster with AI copilots tailored
+                        to your
+                        organization’s data model.
+                    </p>
+                    <a
+                        class="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:text-primary-500">
+                        Learn more
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </a>
+                </div>
+            </article>
+
+            <article
+                class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-lg shadow-slate-200/80 transition hover:-translate-y-1 hover:border-primary-200">
+                <span
+                    class="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-primary-100 opacity-60 blur-2xl transition group-hover:opacity-90"></span>
+                <div class="relative flex h-full flex-col gap-4">
+                    <div
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600/10 text-primary-600 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">shield_locked</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-slate-900">Governance & Compliance</h3>
+                    <p class="text-sm text-slate-600">
+                        Role-based access, audit trails, and automated policies help you meet regional regulations while
+                        keeping
+                        teams agile.
+                    </p>
+                    <a
+                        class="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:text-primary-500">
+                        Learn more
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section
+        class="overflow-hidden rounded-3xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-primary-100 px-8 py-12 shadow-xl shadow-primary-100/70">
+        <div class="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div class="space-y-4">
+                <p class="text-sm font-semibold uppercase tracking-[0.4em] text-primary-600">Ready To Evolve</p>
+                <h2 class="text-3xl font-bold text-slate-900">Bring your teams together on Konecta One today.</h2>
+                <p class="text-base text-slate-600">
+                    Deploy in weeks, not months. Our success engineers guide you from onboarding to adoption with
+                    enterprise-grade support.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <a routerLink="/auth/login"
+                        class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/30 transition hover:-translate-y-0.5 hover:bg-primary-700">
+                        Start your pilot
+                        <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+                    </a>
+                    <button type="button"
+                        class="inline-flex items-center gap-2 rounded-2xl border border-primary-200 px-5 py-3 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-50">
+                        Talk to an expert
+                        <span class="material-symbols-outlined text-[18px]">headset_mic</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-center lg:justify-end">
+                <div
+                    class="inline-flex items-center gap-3 rounded-full border border-primary-200 bg-white/80 px-5 py-3 text-sm font-semibold text-primary-700 shadow">
+                    <span class="material-symbols-outlined text-[22px] text-primary-500">verified_user</span>
+                    SOC 2, ISO 27001 & GDPR compliant
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

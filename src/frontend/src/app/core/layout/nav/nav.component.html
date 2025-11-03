@@ -7,14 +7,6 @@
   aria-label="Global navigation"
 >
   <div class="flex items-center gap-3">
-    <button *ngIf="role"
-      type="button"
-      class="grid grid-cols-3 grid-rows-3 gap-[3px] rounded-xl bg-white/10 text-white p-1.5 transition hover:bg-white/20"
-      (click)="toggle.emit()"
-      aria-label="Toggle navigation"
-    >
-      <span *ngFor="let _ of launcherDots" class="h-[5px] w-[5px] rounded-[2px] bg-current"></span>
-    </button>
     <a
       routerLink="/"
       class="group flex items-center gap-3 no-underline transition"
@@ -22,8 +14,8 @@
       aria-label="Konecta One home link"
     >
       <span
-        class="flex h-12 w-12 items-center justify-center rounded-2xl border transition-all"
-        [ngClass]="brandOn ? 'border-white/20 bg-white/10 text-lime-200' : 'border-primary-100 bg-primary-50 text-primary-500 shadow-sm group-hover:border-primary-200'"
+        class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border bg-white transition-all shadow-sm"
+        [ngClass]="brandOn ? 'border-white/30 bg-white/20' : 'border-primary-100 group-hover:border-primary-200'"
       >
         <svg
           class="h-8 w-8"
@@ -56,14 +48,18 @@
           <circle cx="15.5" cy="40" r="3" fill="currentColor" stroke="none"></circle>
         </svg>
       </span>
-      <span class="flex flex-col leading-tight">
+      <span class="flex flex-col leading-tight text-left">
         <span
-          class="text-xs font-semibold uppercase tracking-[0.38em]"
-          [ngClass]="brandOn ? 'text-white/70' : 'text-slate-500'"
+          class="font-black tracking-tight"
+          [ngClass]="brandOn ? 'text-white text-2xl sm:text-3xl' : 'text-slate-900 text-2xl sm:text-3xl'"
         >
+          Konecta
         </span>
-        <span class="text-2xl font-bold tracking-tight">
-          Konecta One
+        <span
+          class="font-black tracking-[0.12em]"
+          [ngClass]="brandOn ? 'text-blue-200 text-lg sm:text-xl' : 'text-primary-600 text-lg sm:text-xl'"
+        >
+          ONE
         </span>
       </span>
     </a>

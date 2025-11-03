@@ -62,4 +62,8 @@ export class SidebarComponent {
   materialIcon(name: string) {
     return name || 'chevron_right';
   }
+
+  toggleSidebar() {
+    this.isOpen = !this.isOpen;
+  }
 }
