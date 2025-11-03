@@ -18,7 +18,6 @@ services:
     depends_on: [config, discovery]
     networks: [konecta-net]
 
-  # ✨ NEW: Postgres database
   postgres:
     image: postgres:16
     container_name: postgres
@@ -27,11 +26,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
     ports:
-      - "5432:5432"              # optional: expose for local access (psql, DBeaver)
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      # ✅ match the credentials above
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,7 +47,7 @@ services:
         condition: service_started
       discovery:
         condition: service_started
-    environment:
+    # ❌ remove empty environment: (this caused your error)
     networks: [konecta-net]
 
   user-management:
