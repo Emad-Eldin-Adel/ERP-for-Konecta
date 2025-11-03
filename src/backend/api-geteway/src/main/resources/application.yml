@@ -51,7 +51,7 @@ eureka:
 
 app:
   jwt:
-    secret: ChangeThisSecretKeyForJwtAuthService2024!
+    secret: TdOGaOOEmgibACqaax9trGLJMu5y6uv4q8pxDxXY4fuPKoGH67sIwQHC6khsubmgB5nzuR-Q5py2hKCdBsH0eg
   security:
     public-paths:
       - /api/auth/login
