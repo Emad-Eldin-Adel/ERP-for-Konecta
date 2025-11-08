@@ -1,13 +1,13 @@
-package com.example.hr;
+package com.example.hr_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HrApplication {
+public class HrServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HrApplication.class, args);
+		SpringApplication.run(HrServiceApplication.class, args);
 	}
 
 }
