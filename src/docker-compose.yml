@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   discovery:
     build: ./backend/discovery
-    ports: ["8083:8083"]
+    ports: ["8761:8761"]
     networks: [konecta-net]
 
   config:
@@ -30,7 +28,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      # ✅ match the credentials above
       test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
       interval: 10s
       timeout: 5s
@@ -47,7 +44,6 @@ services:
         condition: service_started
       discovery:
         condition: service_started
-    # ❌ remove empty environment: (this caused your error)
     networks: [konecta-net]
 
   user-management:

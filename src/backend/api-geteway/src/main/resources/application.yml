@@ -17,8 +17,6 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
-          filters:
-            - StripPrefix=1
         - id: admin-service
           uri: lb://user-management
           predicates:
@@ -54,6 +52,7 @@ app:
     secret: TdOGaOOEmgibACqaax9trGLJMu5y6uv4q8pxDxXY4fuPKoGH67sIwQHC6khsubmgB5nzuR-Q5py2hKCdBsH0eg
   security:
     public-paths:
+      - /api/auth/register-admin
       - /api/auth/login
       - /api/auth/logout
       - /actuator/**

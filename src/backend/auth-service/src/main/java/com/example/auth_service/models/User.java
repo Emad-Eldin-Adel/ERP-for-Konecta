@@ -1,45 +1,40 @@
 package com.example.auth_service.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_username", columnNames = { "username" }),
-        @UniqueConstraint(name = "uk_users_email", columnNames = { "email" })
-})
-public class User implements UserDetails {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false, length = 50, unique = true)
     private String username;
 
     @Column(name = "full_name", length = 120)
     private String fullName;
 
-    @Column(name = "phone", length = 40)
+    @Column(length = 40)
     private String phone;
 
-    @Column(nullable = false, length = 120)
+    @Column(nullable = false, length = 120, unique = true)
     private String email;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -47,68 +42,104 @@ public class User implements UserDetails {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true, length = 20)
+    @Column(length = 20)
     private UserStatus status;
 
-    @Column(name = "otp_verified")
-    private Boolean otpVerified;
-
-    @Column(name = "otp_hash")
-    private String otpHash;
-
-    @Column(name = "otp_expires_at")
-    private LocalDateTime otpExpiresAt;
-
-    @Column(name = "verification_token", length = 120)
-    private String verificationToken;
-
-    @Column(name = "verification_expires_at")
-    private LocalDateTime verificationExpiresAt;
-
-    // Align with existing DB schema: users.created_at NOT NULL
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+    public User() {
     }
 
-    @Override
-    @JsonIgnore
-    public String getPassword() {
-        return this.password;
+    public User(Long id, LocalDateTime createdAt, String username, String fullName, String phone, String email,
+            String password, Role role, UserStatus status) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.username = username;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.status = status;
     }
 
-    @Override
-    @JsonIgnore
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public String getUsername() {
-        return this.email;
+        return username;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return true;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return this.status == null || this.status != UserStatus.INACTIVE;
+    public String getFullName() {
+        return fullName;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return this.status == null || this.status == UserStatus.ACTIVE;
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (username == null) {
+            username = email;
+        }
     }
 }

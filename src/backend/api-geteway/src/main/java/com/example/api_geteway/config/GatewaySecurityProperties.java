@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class GatewaySecurityProperties {
 
     private List<String> publicPaths = new ArrayList<>(List.of(
+            "/api/auth/register-admin",
             "/api/auth/login",
             "/api/auth/logout",
             "/actuator/**",

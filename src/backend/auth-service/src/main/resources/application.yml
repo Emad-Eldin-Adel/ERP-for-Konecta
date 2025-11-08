@@ -1,4 +1,14 @@
+server:
+  port: 8081
+
+app:
+  jwt:
+    secret: TdOGaOOEmgibACqaax9trGLJMu5y6uv4q8pxDxXY4fuPKoGH67sIwQHC6khsubmgB5nzuR-Q5py2hKCdBsH0eg
+    expiration-minutes: 60
+
 spring:
+  application:
+    name: auth-service
   datasource:
     url: jdbc:postgresql://postgres:5432/auth_db
     username: postgres
@@ -11,7 +21,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-app:
-  jwt:
-    secret: TdOGaOOEmgibACqaax9trGLJMu5y6uv4q8pxDxXY4fuPKoGH67sIwQHC6khsubmgB5nzuR-Q5py2hKCdBsH0eg
-    expiration-minutes: 60
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka/
