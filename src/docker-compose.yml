@@ -46,6 +46,12 @@ services:
         condition: service_started
     networks: [konecta-net]
 
+  hr-service:
+    build: ./backend/hr-service
+    ports: ["8083:8083"]
+    depends_on: [config, discovery]
+    networks: [konecta-net]
+
   user-management:
     build: ./backend/user-management
     ports: ["8084:8084"]
