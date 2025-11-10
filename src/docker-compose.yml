@@ -16,7 +16,7 @@ services:
     depends_on: [config, discovery]
     networks: [konecta-net]
 
-  postgres:
+  auth-postgres:
     image: postgres:16
     container_name: postgres
     environment:
@@ -34,11 +34,33 @@ services:
       retries: 5
     networks: [konecta-net]
 
+  hr-postgres:
+    image: postgres:16
+    container_name: hr-postgres
+    environment:
+      POSTGRES_DB: hr_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5433:5432"
+    volumes:
+      - hr_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hr_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [konecta-net]
+
   auth-service:
     build: ./backend/auth-service
     ports: ["8081:8081"]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
     depends_on:
-      postgres:
+      auth-postgres:
         condition: service_healthy
       config:
         condition: service_started
@@ -49,7 +71,17 @@ services:
   hr-service:
     build: ./backend/hr-service
     ports: ["8083:8083"]
-    depends_on: [config, discovery]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://hr-postgres:5432/hr_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      hr-postgres:
+        condition: service_healthy
+      config:
+        condition: service_started
+      discovery:
+        condition: service_started
     networks: [konecta-net]
 
   user-management:
@@ -70,3 +102,4 @@ networks:
 
 volumes:
   pgdata:
+  hr_pgdata:

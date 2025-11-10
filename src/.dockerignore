@@ -1,0 +1,24 @@
+# Builds / deps
+**/target
+**/node_modules
+**/dist
+**/build
+
+# IDE / VCS
+.git
+.gitignore
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+
+# Noise / dumps
+**/*.log
+**/*.zip
+**/*.7z
+**/*.rar
+**/*.tar
+**/*.tar.gz
+**/*.bak
+**/*.sql
+**/*.dump
