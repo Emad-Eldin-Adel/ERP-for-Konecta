@@ -5,6 +5,11 @@ app:
   jwt:
     secret: TdOGaOOEmgibACqaax9trGLJMu5y6uv4q8pxDxXY4fuPKoGH67sIwQHC6khsubmgB5nzuR-Q5py2hKCdBsH0eg
     expiration-minutes: 60
+  admin:
+    full-name: System Administrator
+    phone: "+10000000000"
+    email: admin@konecta.com
+    password: ChangeMe123!
 
 spring:
   application:

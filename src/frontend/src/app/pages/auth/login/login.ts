@@ -36,11 +36,14 @@ export class LoginComponent {
       return;
     }
     this.submitting = true;
-    const { email, password, remember } = this.form.value as any;
+    const { email, password, remember } = this.form.value as {
+      email: string;
+      password: string;
+      remember: boolean;
+    };
 
-    this.auth.login({ email, password }).subscribe({
-      next: (res) => {
-        this.auth.saveToken(res.token, !!remember);
+    this.auth.login({ email, password }, !!remember).subscribe({
+      next: () => {
         this.router.navigateByUrl('/'); // go home (or /dashboard)
       },
       error: (err) => {
