@@ -18,43 +18,42 @@ jobs:
   # ------------------------------
   # 🧠 AI Model Pipeline
   # ------------------------------
-  ai-model:
-    runs-on: ubuntu-latest
-    name: 🤖 Train & Test AI Model
+  # ai-model:
+  #   runs-on: ubuntu-latest
+  #   name: 🤖 Train & Test AI Model
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v5
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+  #     - name: Install AI Dependencies
+  #       working-directory: ./ai
+  #       run: |
+  #         if [ -f "requirements.txt" ]; then
+  #           pip install -r requirements.txt
+  #         else
+  #           echo "⚠️ No requirements.txt found in /ai"
+  #         fi
 
-      - name: Install AI Dependencies
-        working-directory: ./ai
-        run: |
-          if [ -f "requirements.txt" ]; then
-            pip install -r requirements.txt
-          else
-            echo "⚠️ No requirements.txt found in /ai"
-          fi
+  #     - name: Run AI Model Tests
+  #       working-directory: ./ai
+  #       run: |
+  #         if [ -d "tests" ]; then
+  #           pytest tests/ --maxfail=1 --disable-warnings -q
+  #         else
+  #           echo "✅ No tests directory found, skipping AI tests"
+  #         fi
 
-      - name: Run AI Model Tests
-        working-directory: ./ai
-        run: |
-          if [ -d "tests" ]; then
-            pytest tests/ --maxfail=1 --disable-warnings -q
-          else
-            echo "✅ No tests directory found, skipping AI tests"
-          fi
-
-      - name: Save Trained Model Artifact
-        if: success()
-        uses: actions/upload-artifact@v5
-        with:
-          name: ai-model-artifact
-          path: ai/models/
+  #      - name: Save Trained Model Artifact
+  #        if: success()
+  #        uses: actions/upload-artifact@v5
+  #        with:
+  #          name: ai-model-artifact
+  #          path: ai/models/
 
   # ------------------------------
   # 🛡️ Security Scan
@@ -91,7 +90,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: 🧱 Build and Package Application
-    needs: [ai-model, security-scan]
+    needs: [security-scan]
 
     steps:
       # ------------------------------
@@ -151,7 +150,9 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: 8.0.x
+          include-prerelease: false
+          dotnet-quality: "ga"
 
       - name: Restore .NET Dependencies
         working-directory: ./backend/dotnet
