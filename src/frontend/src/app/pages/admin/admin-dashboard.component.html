@@ -1,0 +1,154 @@
+<section class="space-y-10">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-primary-500">Admin Console</p>
+      <h1 class="text-3xl font-bold text-slate-900">People & Access</h1>
+      <p class="text-sm text-slate-500">Invite new teammates, manage roles, and control workspace access.</p>
+    </div>
+    <button type="button" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-primary-200 hover:text-primary-600" (click)="refreshData()">
+      Refresh
+    </button>
+  </header>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-2xl border border-primary-100 bg-primary-50/60 p-4 shadow-sm" *ngIf="summary as s">
+      <p class="text-xs font-semibold uppercase tracking-wide text-primary-600">Total Members</p>
+      <p class="mt-2 text-3xl font-bold text-primary-900">{{ s.total }}</p>
+      <p class="text-xs text-primary-700">Active {{ s.active }} • Inactive {{ s.inactive }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" *ngIf="summary as s">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Administrators</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">{{ s.admins }}</p>
+      <p class="text-xs text-slate-500">HR {{ s.hr }} • Finance {{ s.finance }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" *ngIf="summary as s">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Employees</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">{{ s.employees }}</p>
+      <p class="text-xs text-slate-500">Workspace-wide</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900" *ngIf="!loadingUsers()">Live</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900" *ngIf="loadingUsers()">Updating…</p>
+      <p class="text-xs text-slate-500">Last sync moments ago</p>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+    <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-semibold text-slate-900">Team members</h2>
+          <p class="text-sm text-slate-500">Manage access, roles, and status.</p>
+        </div>
+      </div>
+
+      <div *ngIf="userError()" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        {{ userError() }}
+      </div>
+
+      <div class="mt-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-3 py-2 font-semibold">Member</th>
+              <th class="px-3 py-2 font-semibold">Role</th>
+              <th class="px-3 py-2 font-semibold">Status</th>
+              <th class="px-3 py-2 font-semibold">Created</th>
+              <th class="px-3 py-2 font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+            <tr *ngFor="let user of users; trackBy: trackByUserId">
+              <td class="whitespace-nowrap px-3 py-3">
+                <p class="font-semibold text-slate-900">{{ user.fullName || 'Unnamed user' }}</p>
+                <p class="text-xs text-slate-500">{{ user.email }}</p>
+              </td>
+              <td class="whitespace-nowrap px-3 py-3">
+                <select
+                  class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm"
+                  [value]="user.role"
+                  (change)="updateRole(user, $any($event.target).value)"
+                >
+                  <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+                </select>
+              </td>
+              <td class="whitespace-nowrap px-3 py-3">
+                <span
+                  class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  [ngClass]="user.status === 'ACTIVE' ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200'"
+                >
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="whitespace-nowrap px-3 py-3 text-xs text-slate-500">
+                {{ user.createdAt | date: 'mediumDate' }}
+              </td>
+              <td class="whitespace-nowrap px-3 py-3">
+                <button
+                  type="button"
+                  class="rounded-lg border px-3 py-1 text-xs font-semibold transition"
+                  [ngClass]="user.status === 'ACTIVE' ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
+                  (click)="toggleStatus(user)"
+                >
+                  {{ user.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!loadingUsers() && users.length === 0">
+              <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">No users yet. Invite your first teammate.</td>
+            </tr>
+            <tr *ngIf="loadingUsers()">
+              <td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">Loading users…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm">
+      <h2 class="text-xl font-semibold text-slate-900">Invite teammate</h2>
+      <p class="text-sm text-slate-500">Assign a role, optionally set a password, and share the invite.</p>
+
+      <form class="mt-6 space-y-4" [formGroup]="inviteForm" (ngSubmit)="submitInvite()">
+        <div>
+          <label class="text-sm font-medium text-slate-700">Full name</label>
+          <input type="text" formControlName="fullName" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Email</label>
+          <input type="email" formControlName="email" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Phone</label>
+          <input type="text" formControlName="phone" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Role</label>
+          <select formControlName="role" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100">
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Password (optional)</label>
+          <input type="text" formControlName="password" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" placeholder="Leave blank to auto-generate" />
+        </div>
+
+        <div *ngIf="inviteMessage()" class="rounded-xl border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700">
+          {{ inviteMessage() }}
+        </div>
+        <div *ngIf="inviteError()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+          {{ inviteError() }}
+        </div>
+
+        <button
+          type="submit"
+          class="w-full rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-600/30 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="inviteSubmitting()"
+        >
+          {{ inviteSubmitting() ? 'Inviting…' : 'Invite user' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

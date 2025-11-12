@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.auth_service.config.JwtProperties;
 import com.example.auth_service.models.User;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -40,5 +41,13 @@ public class JwtTokenService {
                 .claim("role", user.getRole().name())
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public Claims parseToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

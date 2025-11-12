@@ -1,0 +1,41 @@
+<section class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm space-y-5">
+  <header>
+    <h2 class="text-xl font-semibold text-slate-900">Offboarding workflow</h2>
+    <p class="text-sm text-slate-500">Coordinate exits with clarity and in one place.</p>
+  </header>
+
+  <form class="grid gap-4 md:grid-cols-3" [formGroup]="form" (ngSubmit)="loadStatus()">
+    <div>
+      <label class="text-sm font-medium text-slate-700">Employee ID</label>
+      <input type="number" formControlName="employeeId" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+    </div>
+    <div>
+      <label class="text-sm font-medium text-slate-700">Last working day</label>
+      <input type="date" formControlName="lastWorkingDay" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+    </div>
+    <div>
+      <label class="text-sm font-medium text-slate-700">Exit interview</label>
+      <input type="datetime-local" formControlName="interviewAt" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+    </div>
+    <div class="md:col-span-3 flex flex-wrap gap-2">
+      <button type="submit" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-primary-200 hover:text-primary-600">Check status</button>
+      <button type="button" class="rounded-xl bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-100" (click)="trigger('initiate')">Initiate</button>
+      <button type="button" class="rounded-xl bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-100" (click)="trigger('interview')">Mark interview</button>
+      <button type="button" class="rounded-xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-100" (click)="trigger('clearance')">Clearance</button>
+      <button type="button" class="rounded-xl bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100" (click)="trigger('exit')">Finalize</button>
+    </div>
+  </form>
+
+  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">{{ error() }}</div>
+
+  <div class="rounded-2xl border border-slate-200 bg-white px-6 py-4" *ngIf="status() as s">
+    <h3 class="text-lg font-semibold text-slate-900">Current status: {{ s.status }}</h3>
+    <ul class="mt-3 space-y-2 text-sm text-slate-600">
+      <li>Employee ID: #{{ s.employeeId }}</li>
+      <li>Last working day: {{ s.lastWorkingDay || 'TBD' }}</li>
+      <li>Interview at: {{ s.interviewAt || 'TBD' }}</li>
+      <li *ngIf="s.clearanceFormUrl">Clearance form: <a [href]="s.clearanceFormUrl" target="_blank" class="text-primary-600 hover:underline">View</a></li>
+      <li *ngIf="s.experienceLetterUrl">Experience letter: <a [href]="s.experienceLetterUrl" target="_blank" class="text-primary-600 hover:underline">View</a></li>
+    </ul>
+  </div>
+</section>

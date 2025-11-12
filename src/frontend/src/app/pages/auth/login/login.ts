@@ -43,8 +43,9 @@ export class LoginComponent {
     };
 
     this.auth.login({ email, password }, !!remember).subscribe({
-      next: () => {
-        this.router.navigateByUrl('/'); // go home (or /dashboard)
+      next: (res) => {
+        const destination = res.role === 'ADMIN' ? '/admin' : '/';
+        this.router.navigateByUrl(destination);
       },
       error: (err) => {
         this.serverError =

@@ -1,0 +1,197 @@
+<section class="space-y-8">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">HR Workspace</p>
+      <h1 class="text-3xl font-bold text-slate-900">Employee Directory</h1>
+      <p class="text-sm text-slate-500">Track every teammate, manage assignments, and keep records in sync.</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <div class="relative">
+        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+        </span>
+        <input
+          type="search"
+          class="rounded-full border border-slate-200 bg-white px-3 py-2 pl-10 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+          placeholder="Search people..."
+          (input)="search.set($any($event.target).value)"
+        />
+      </div>
+      <button
+        type="button"
+        class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
+        (click)="startCreate()"
+      >
+        <span class="material-symbols-outlined text-[18px] align-middle mr-1">add</span>
+        Add employee
+      </button>
+    </div>
+  </header>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div class="rounded-2xl border border-primary-100 bg-primary-50/70 p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-primary-600">Total headcount</p>
+      <p class="mt-2 text-3xl font-bold text-primary-900">{{ stats().total }}</p>
+      <p class="text-xs text-primary-700">New hire: {{ stats().newestHire ?? '—' }}</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Departments</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">{{ stats().departments }}</p>
+      <p class="text-xs text-slate-500">Active teams collaborating</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Average salary</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">${{ stats().avgSalary }}</p>
+      <p class="text-xs text-slate-500">Based on available data</p>
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</p>
+      <p class="mt-2 text-3xl font-bold text-slate-900">{{ loading() ? 'Syncing…' : 'Up to date' }}</p>
+      <p class="text-xs text-slate-500">Directory refreshed live</p>
+    </div>
+  </div>
+
+  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+    {{ error() }}
+  </div>
+
+  <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">Employee</th>
+          <th class="px-4 py-3 text-left font-semibold">Department</th>
+          <th class="px-4 py-3 text-left font-semibold">Position</th>
+          <th class="px-4 py-3 text-left font-semibold">Hire date</th>
+          <th class="px-4 py-3 text-left font-semibold">Compensation</th>
+          <th class="px-4 py-3 text-left font-semibold">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 text-slate-700">
+        <tr *ngFor="let employee of filteredEmployees(); trackBy: trackById">
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">{{ employee.firstName }} {{ employee.lastName }}</p>
+            <p class="text-xs text-slate-500">{{ employee.email }}</p>
+            <p class="text-xs text-slate-500">{{ employee.phone }}</p>
+          </td>
+          <td class="px-4 py-3">
+            <p class="font-medium">{{ employee.departmentName || '—' }}</p>
+          </td>
+          <td class="px-4 py-3">
+            <p class="font-medium">{{ employee.position || '—' }}</p>
+            <p class="text-xs text-slate-500">{{ employee.workingHours ? employee.workingHours + ' hrs/week' : '' }}</p>
+          </td>
+          <td class="px-4 py-3 text-xs text-slate-500">
+            {{ employee.hireDate || '—' }}
+          </td>
+          <td class="px-4 py-3">
+            <p class="text-sm font-semibold">${{ employee.salary || 0 }}</p>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-2">
+              <button
+                class="rounded-lg border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:border-primary-200 hover:text-primary-600"
+                type="button"
+                (click)="startEdit(employee)"
+              >
+                Edit
+              </button>
+              <button
+                class="rounded-lg border border-red-200 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                type="button"
+                (click)="deleteEmployee(employee)"
+              >
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading() && filteredEmployees().length === 0">
+          <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">No employees match that search.</td>
+        </tr>
+        <tr *ngIf="loading()">
+          <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">Loading employees…</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    *ngIf="showForm()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
+  >
+    <div class="w-full max-w-3xl rounded-3xl bg-white shadow-2xl">
+      <div class="flex items-start justify-between border-b border-slate-100 px-6 py-4">
+        <div>
+          <h2 class="text-xl font-semibold text-slate-900">{{ formTitle() }}</h2>
+          <p class="text-sm text-slate-500">{{ selectedEmployee() ? 'Update existing record' : 'Create a new profile' }}</p>
+        </div>
+        <button
+          type="button"
+          class="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          (click)="cancelForm()"
+          aria-label="Close form"
+        >
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form class="grid gap-4 px-6 py-5 lg:grid-cols-2" [formGroup]="form" (ngSubmit)="submitForm()">
+        <div>
+          <label class="text-sm font-medium text-slate-700">First name</label>
+          <input type="text" formControlName="firstName" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Last name</label>
+          <input type="text" formControlName="lastName" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Email</label>
+          <input type="email" formControlName="email" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Phone</label>
+          <input type="text" formControlName="phone" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Position</label>
+          <input type="text" formControlName="position" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Department ID</label>
+          <input type="number" formControlName="departmentId" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" placeholder="Optional" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Hire date</label>
+          <input type="date" formControlName="hireDate" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Salary</label>
+          <input type="number" step="0.01" formControlName="salary" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-700">Weekly hours</label>
+          <input type="number" step="0.5" formControlName="workingHours" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+        </div>
+
+        <div class="lg:col-span-2">
+          <div *ngIf="formError()" class="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+            {{ formError() }}
+          </div>
+          <div class="flex flex-wrap justify-end gap-3">
+            <button type="button" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50" (click)="cancelForm()">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-xl bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+              [disabled]="submitting()"
+            >
+              {{ submitting() ? 'Saving…' : 'Save changes' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

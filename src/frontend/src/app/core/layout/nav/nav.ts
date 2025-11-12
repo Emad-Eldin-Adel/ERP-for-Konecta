@@ -3,6 +3,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService, AuthUser } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,16 +14,17 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent {
   brandOn = false;
-  role: 'EMPLOYEE' | 'ADMIN' | 'HR' | 'FINANCE' | null = null;
+  role: AuthUser['role'] | null = null;
 
   isHomeRoute = false;
   isAuthRoute = false;
   isProfileMenuOpen = false;
 
   initials = 'AA';
-  email = 'user@example.com';
+  email = '';
 
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   constructor() {
     // set initial flags
@@ -30,6 +33,10 @@ export class NavbarComponent {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.setFlags(e.urlAfterRedirects));
+
+    this.auth.currentUser$
+      .pipe(takeUntilDestroyed())
+      .subscribe((user) => this.applyUser(user));
   }
 
   private setFlags(url: string) {
@@ -37,8 +44,30 @@ export class NavbarComponent {
     this.isAuthRoute = url.startsWith('/auth/');
   }
 
+  private applyUser(user: AuthUser | null) {
+    this.role = user?.role ?? null;
+    this.email = user?.email ?? '';
+    this.initials = this.createInitials(user?.fullName || user?.email || '');
+    this.brandOn = !!user;
+  }
+
+  private createInitials(value: string) {
+    if (!value) {
+      return 'AA';
+    }
+    const parts = value.trim().split(/\s+/);
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
   toggleProfileMenu() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
-  onSignOutClick() {}
+  onSignOutClick() {
+    this.auth.logout();
+    this.router.navigateByUrl('/auth/login');
+    this.isProfileMenuOpen = false;
+  }
 }

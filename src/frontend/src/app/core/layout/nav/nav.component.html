@@ -102,13 +102,14 @@
     </div>
     <!-- Admin primary nav buttons (placeholders) -->
     <div *ngIf="role === 'ADMIN'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
-      <a routerLink="/admin/users" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Users</a>
+      <a routerLink="/admin" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Dashboard</a>
+      <a routerLink="/hr/employees" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">People</a>
       <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Roles</button>
       <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Settings</button>
     </div>
     <!-- HR primary nav buttons (placeholders) -->
     <div *ngIf="role === 'HR'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
-      <a routerLink="/hr/users" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Users</a>
+      <a routerLink="/hr/employees" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Employees</a>
       <a routerLink="/hr/attendance" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Attendance</a>
       <a routerLink="/hr/leaves" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</a>
     </div>
