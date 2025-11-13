@@ -20,9 +20,6 @@ public class AdminUserProperties {
      */
     private String email = "admin@konecta.com";
 
-    /**
-     * Plain text password that will be encoded on startup.
-     */
     private String password = "ChangeMe123!";
 
     public String getFullName() {

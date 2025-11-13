@@ -48,25 +48,30 @@
             </ng-container>
             <!-- Non-link items: either placeholders or groups -->
             <ng-template #nonLinkItem>
-                <button type="button"
-                    class="group flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
-                    (click)="item.children ? toggleGroup(i) : null"
-                    [attr.aria-expanded]="item.children ? isExpanded(i) : null">
-                    <span
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
-                        <span class="material-symbols-outlined text-[20px]">
-                            {{ materialIcon(item.icon) }}
+                <div class="flex items-center gap-2">
+                    <a class="group flex flex-1 items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
+                        [routerLink]="primaryPath(item)" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                        [routerLinkActiveOptions]="{ exact: true }">
+                        <span
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                            <span class="material-symbols-outlined text-[20px]">
+                                {{ materialIcon(item.icon) }}
+                            </span>
                         </span>
-                    </span>
-                    <span *ngIf="isOpen; else srOnlyStatic" class="whitespace-nowrap text-sm font-medium">{{ item.label
-                        }}</span>
-                    <ng-template #srOnlyStatic><span class="sr-only">{{ item.label }}</span></ng-template>
-                    <span *ngIf="isOpen && item.children"
-                        class="material-symbols-outlined ml-auto text-[18px] transition-transform"
-                        [ngClass]="{ '-rotate-180': isExpanded(i) }">expand_more</span>
-                </button>
+                        <span *ngIf="isOpen; else srOnlyStatic" class="whitespace-nowrap text-sm font-medium">{{
+                            item.label }}</span>
+                        <ng-template #srOnlyStatic><span class="sr-only">{{ item.label }}</span></ng-template>
+                    </a>
+                    <button *ngIf="item.children" type="button"
+                        class="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:text-primary-600"
+                        (click)="toggleGroup(i)" [attr.aria-expanded]="isExpanded(i)">
+                        <span class="material-symbols-outlined text-[20px]"
+                            [ngClass]="{ '-rotate-180': isExpanded(i) }">expand_more</span>
+                    </button>
+                </div>
                 <!-- Children -->
-                <ul *ngIf="item.children && isExpanded(i) && isOpen" class="mt-1 ml-11 flex flex-col gap-1">
+                <ul *ngIf="item.children && isExpanded(i)" class="mt-1 flex flex-col gap-1"
+                    [ngClass]="isOpen ? 'ml-11' : 'ml-2'">
                     <li *ngFor="let child of item.children">
                         <ng-container *ngIf="child.path; else nonLinkChild">
                             <a class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"

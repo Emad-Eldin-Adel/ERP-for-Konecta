@@ -108,6 +108,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks: [konecta-net]
 
   finance-service:
@@ -127,10 +132,10 @@ services:
       finance-postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      discovery:
         condition: service_started
       config:
-        condition: service_started
-      discovery:
         condition: service_started
     networks: [konecta-net]
 

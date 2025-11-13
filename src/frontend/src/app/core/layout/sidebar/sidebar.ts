@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -11,7 +11,7 @@ type NavItem = { label: string; icon: string; path?: string; children?: NavChild
   templateUrl: './sidebar.component.html',
   imports: [CommonModule, RouterLink, RouterLinkActive],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   /** compact vs expanded width */
   private _isOpen = true;
 
@@ -62,9 +62,19 @@ export class SidebarComponent {
 
   /** expanded group state */
   private expanded = new Set<number>();
+
+  ngOnInit(): void {
+    this.computedItems.forEach((item, index) => {
+      if (item.children?.length) {
+        this.expanded.add(index);
+      }
+    });
+  }
+
   toggleGroup(i: number) {
     this.expanded.has(i) ? this.expanded.delete(i) : this.expanded.add(i);
   }
+
   isExpanded(i: number) {
     return this.expanded.has(i);
   }
@@ -78,5 +88,11 @@ export class SidebarComponent {
     const next = !this._isOpen;
     this._isOpen = next;
     this.isOpenChange.emit(next);
+  }
+
+  primaryPath(item: NavItem): string {
+    if (item.path) return item.path;
+    const firstChild = item.children?.find((child) => !!child.path);
+    return firstChild?.path ?? this.dashPath;
   }
 }
