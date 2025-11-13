@@ -1,0 +1,99 @@
+<section class="space-y-6">
+  <header class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900">Payroll ledger</h2>
+        <p class="text-sm text-slate-500">Reconcile payments and trace outstanding compensation.</p>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <label class="text-slate-500" for="payrollPeriod">Period</label>
+        <input
+          id="payrollPeriod"
+          type="month"
+          class="rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+          [value]="period()"
+          (change)="updatePeriod($any($event.target).value)"
+        />
+        <button class="rounded-full border border-slate-200 px-3 py-2 text-slate-500 hover:text-primary-600" (click)="loadRows()">
+          Refresh
+        </button>
+      </div>
+    </div>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <div class="rounded-2xl border border-slate-100 bg-white px-4 py-3">
+        <p class="text-xs uppercase text-slate-500">Records</p>
+        <p class="text-2xl font-bold text-slate-900">{{ totals().count }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white px-4 py-3">
+        <p class="text-xs uppercase text-slate-500">Paid</p>
+        <p class="text-2xl font-bold text-emerald-600">{{ formatCurrency(totals().paid) }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white px-4 py-3">
+        <p class="text-xs uppercase text-slate-500">Pending</p>
+        <p class="text-2xl font-bold text-amber-600">{{ formatCurrency(totals().pending) }}</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-wrap gap-2 text-sm font-semibold">
+    <button
+      *ngFor="let option of filters"
+      class="rounded-full border px-4 py-2 transition"
+      [class.border-primary-200]="filter() === option"
+      [class.text-primary-600]="filter() === option"
+      (click)="changeFilter(option)"
+    >
+      {{ option }}
+    </button>
+  </div>
+
+  <div *ngIf="error()" class="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-700">
+    {{ error() }}
+  </div>
+
+  <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <th class="px-4 py-3">Employee</th>
+          <th class="px-4 py-3 text-right">Base</th>
+          <th class="px-4 py-3 text-right">Bonuses</th>
+          <th class="px-4 py-3 text-right">Deductions</th>
+          <th class="px-4 py-3 text-right">Net</th>
+          <th class="px-4 py-3">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else loadingRows">
+        <tr *ngFor="let row of filteredRows(); trackBy: trackRow">
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">{{ row.name || ('#' + row.employeeId) }}</p>
+            <p class="text-xs text-slate-500">{{ row.accountMasked || 'No account on file' }}</p>
+          </td>
+          <td class="px-4 py-3 text-right">{{ formatCurrency(row.base) }}</td>
+          <td class="px-4 py-3 text-right text-emerald-600">{{ formatCurrency(row.bonuses) }}</td>
+          <td class="px-4 py-3 text-right text-rose-600">-{{ formatCurrency(row.deductions) }}</td>
+          <td class="px-4 py-3 text-right font-semibold text-slate-900">{{ formatCurrency(row.net) }}</td>
+          <td class="px-4 py-3">
+            <span
+              class="rounded-full px-3 py-1 text-xs font-semibold"
+              [class.bg-emerald-50]="row.paid"
+              [class.text-emerald-600]="row.paid"
+              [class.bg-amber-50]="!row.paid"
+              [class.text-amber-600]="!row.paid"
+            >
+              {{ row.paid ? 'Paid' : 'Pending' }}
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="!filteredRows().length">
+          <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+            Nothing to show for this filter.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loadingRows>
+      <div class="p-6 text-center text-sm text-slate-500">Loading payroll…</div>
+    </ng-template>
+  </div>
+</section>

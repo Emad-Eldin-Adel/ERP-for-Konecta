@@ -15,6 +15,11 @@ import { HrPerformanceComponent } from './pages/hr/performance/performance.compo
 import { HrTrainingComponent } from './pages/hr/training/training.component';
 import { HrOffboardingComponent } from './pages/hr/offboarding/offboarding.component';
 import { rolesGuard } from './core/guards/roles.guard';
+import { FinanceShellComponent } from './pages/finance/finance-shell';
+import { FinanceOverviewComponent } from './pages/finance/overview/finance-overview.component';
+import { FinanceExpensesComponent } from './pages/finance/expenses/finance-expenses.component';
+import { FinanceInvoicesComponent } from './pages/finance/invoices/finance-invoices.component';
+import { FinancePayrollComponent } from './pages/finance/payroll/finance-payroll.component';
 
 export const routes: Routes = [
   {
@@ -38,6 +43,19 @@ export const routes: Routes = [
           { path: 'performance', component: HrPerformanceComponent },
           { path: 'training', component: HrTrainingComponent },
           { path: 'offboarding', component: HrOffboardingComponent },
+        ],
+      },
+      {
+        path: 'finance',
+        component: FinanceShellComponent,
+        canActivate: [rolesGuard],
+        data: { roles: ['ADMIN', 'FINANCE'] },
+        children: [
+          { path: '', redirectTo: 'overview', pathMatch: 'full' },
+          { path: 'overview', component: FinanceOverviewComponent },
+          { path: 'expenses', component: FinanceExpensesComponent },
+          { path: 'invoices', component: FinanceInvoicesComponent },
+          { path: 'payroll', component: FinancePayrollComponent },
         ],
       },
     ],

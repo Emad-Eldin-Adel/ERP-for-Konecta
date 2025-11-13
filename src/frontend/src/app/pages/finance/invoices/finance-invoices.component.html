@@ -1,0 +1,231 @@
+<section class="space-y-6">
+  <header class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900">Billing</h2>
+        <p class="text-sm text-slate-500">Create estimates, send invoices, and capture status.</p>
+      </div>
+      <button
+        class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
+        (click)="openForm()"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        New invoice
+      </button>
+    </div>
+    <div class="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm text-emerald-700">
+      <div class="font-semibold">{{ formatCurrency(totalDraft()) }} outstanding</div>
+      <p>Across {{ filteredInvoices().length }} invoices (filtered view).</p>
+    </div>
+  </header>
+
+  <div class="flex flex-wrap gap-2 text-sm font-semibold">
+    <button
+      *ngFor="let status of statuses"
+      class="rounded-full border px-4 py-2 transition"
+      [class.border-primary-200]="statusFilter() === status"
+      [class.text-primary-600]="statusFilter() === status"
+      (click)="changeFilter(status)"
+    >
+      {{ status }}
+    </button>
+  </div>
+
+  <div *ngIf="error()" class="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-700">
+    {{ error() }}
+  </div>
+
+  <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <th class="px-4 py-3">Client</th>
+          <th class="px-4 py-3">Invoice date</th>
+          <th class="px-4 py-3">Amount</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else loadingInvoices">
+        <tr *ngFor="let invoice of filteredInvoices(); trackBy: trackInvoice">
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">{{ invoice.clientName }}</p>
+            <p class="text-xs text-slate-500">#{{ invoice.id }}</p>
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-600">{{ invoice.invoiceDate | date : 'mediumDate' }}</td>
+          <td class="px-4 py-3 font-semibold text-slate-900">{{ formatCurrency(totalFor(invoice)) }}</td>
+          <td class="px-4 py-3">
+            <span
+              class="rounded-full px-3 py-1 text-xs font-semibold"
+              [class.bg-slate-100]="invoice.status === 'DRAFT'"
+              [class.text-slate-600]="invoice.status === 'DRAFT'"
+              [class.bg-amber-50]="invoice.status === 'SENT'"
+              [class.text-amber-600]="invoice.status === 'SENT'"
+              [class.bg-emerald-50]="invoice.status === 'PAID'"
+              [class.text-emerald-600]="invoice.status === 'PAID'"
+            >
+              {{ invoice.status }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right text-sm">
+            <button
+              *ngIf="invoice.status === 'DRAFT'"
+              class="rounded-full border border-primary-200 px-3 py-1 text-primary-600 hover:bg-primary-50"
+              (click)="sendInvoice(invoice)"
+            >
+              Send
+            </button>
+            <button
+              *ngIf="invoice.status === 'SENT'"
+              class="ml-2 rounded-full border border-emerald-200 px-3 py-1 text-emerald-600 hover:bg-emerald-50"
+              (click)="markPaid(invoice)"
+            >
+              Mark paid
+            </button>
+            <span *ngIf="invoice.status === 'PAID'" class="text-slate-400">—</span>
+          </td>
+        </tr>
+        <tr *ngIf="!filteredInvoices().length">
+          <td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">
+            No invoices for this filter.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loadingInvoices>
+      <div class="p-6 text-center text-sm text-slate-500">Loading invoices…</div>
+    </ng-template>
+  </div>
+
+  <article *ngIf="showForm()" class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <header class="flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Draft invoice</h3>
+        <p class="text-sm text-slate-500">Fill in line items, we’ll calculate totals automatically.</p>
+      </div>
+      <button class="text-sm font-semibold text-slate-500 hover:text-slate-800" (click)="closeForm()">Close</button>
+    </header>
+    <form class="mt-4 space-y-4" [formGroup]="form" (ngSubmit)="submitInvoice()">
+      <div class="grid gap-4 md:grid-cols-2">
+        <label class="text-sm font-semibold text-slate-600">
+          Client name
+          <input
+            type="text"
+            formControlName="clientName"
+            class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+          />
+        </label>
+        <label class="text-sm font-semibold text-slate-600">
+          Invoice date
+          <input
+            type="date"
+            formControlName="invoiceDate"
+            class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+          />
+        </label>
+      </div>
+
+      <div formArrayName="items" class="space-y-4">
+        <div
+          *ngFor="let group of items.controls; let i = index"
+          [formGroupName]="i"
+          class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4"
+        >
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-600">Line {{ i + 1 }}</p>
+            <button
+              type="button"
+              class="text-xs font-semibold text-rose-500 hover:text-rose-700"
+              (click)="removeItem(i)"
+              [disabled]="items.length === 1"
+            >
+              Remove
+            </button>
+          </div>
+          <div class="mt-3 grid gap-3 md:grid-cols-2">
+            <label class="text-xs font-semibold text-slate-500">
+              Product / service
+              <input
+                type="text"
+                formControlName="product"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Account
+              <input
+                type="text"
+                formControlName="account"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Quantity
+              <input
+                type="number"
+                step="0.01"
+                formControlName="quantity"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Unit price
+              <input
+                type="number"
+                step="0.01"
+                formControlName="price"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Discount %
+              <input
+                type="number"
+                step="0.1"
+                formControlName="discountPercent"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Tax %
+              <input
+                type="number"
+                step="0.1"
+                formControlName="taxPercent"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+            <label class="text-xs font-semibold text-slate-500">
+              Withholding %
+              <input
+                type="number"
+                step="0.1"
+                formControlName="whPercent"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 focus:border-primary-500 focus:outline-none"
+              />
+            </label>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-full border border-dashed border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-primary-300 hover:text-primary-600"
+          (click)="addItem()"
+        >
+          <span class="material-symbols-outlined text-base">add</span>
+          Add line item
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="text-sm text-rose-600" *ngIf="formError()">{{ formError() }}</div>
+        <button
+          type="submit"
+          class="rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700 disabled:opacity-50"
+          [disabled]="submitting()"
+        >
+          {{ submitting() ? 'Saving…' : 'Save draft' }}
+        </button>
+      </div>
+    </form>
+  </article>
+</section>

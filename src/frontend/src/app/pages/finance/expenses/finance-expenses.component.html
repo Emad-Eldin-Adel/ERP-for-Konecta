@@ -1,0 +1,180 @@
+<section class="space-y-6">
+  <header class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-slate-900">Operational spend</h2>
+        <p class="text-sm text-slate-500">Review requests and keep approvals moving.</p>
+      </div>
+      <button
+        class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
+        (click)="openForm()"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        New expense
+      </button>
+    </div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-4 text-center">
+      <div class="rounded-2xl border border-slate-100 bg-white py-3">
+        <p class="text-xs uppercase text-slate-500">Total</p>
+        <p class="text-2xl font-bold text-slate-900">{{ counts().total }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white py-3">
+        <p class="text-xs uppercase text-slate-500">Pending</p>
+        <p class="text-2xl font-bold text-amber-600">{{ counts().pending }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white py-3">
+        <p class="text-xs uppercase text-slate-500">Approved</p>
+        <p class="text-2xl font-bold text-emerald-600">{{ counts().approved }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-white py-3">
+        <p class="text-xs uppercase text-slate-500">Rejected</p>
+        <p class="text-2xl font-bold text-rose-600">{{ counts().rejected }}</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex flex-wrap gap-2 text-sm font-semibold">
+    <button
+      *ngFor="let status of statuses"
+      class="rounded-full border px-4 py-2 transition"
+      [class.border-primary-200]="statusFilter() === status"
+      [class.text-primary-600]="statusFilter() === status"
+      (click)="changeFilter(status)"
+    >
+      {{ status }}
+    </button>
+  </div>
+
+  <div *ngIf="error()" class="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-700">
+    {{ error() }}
+  </div>
+
+  <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <th class="px-4 py-3">Category</th>
+          <th class="px-4 py-3">Department</th>
+          <th class="px-4 py-3">Amount</th>
+          <th class="px-4 py-3">Submitted</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else loadingRows">
+        <tr *ngFor="let expense of filteredExpenses(); trackBy: trackExpense">
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">{{ expense.category || 'General' }}</p>
+            <p class="text-xs text-slate-500">{{ expense.description || '—' }}</p>
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-600">{{ expense.department || 'Company' }}</td>
+          <td class="px-4 py-3 font-semibold text-slate-900">{{ formatCurrency(expense.amount) }}</td>
+          <td class="px-4 py-3 text-xs text-slate-500">{{ expense.createdAt | date : 'medium' }}</td>
+          <td class="px-4 py-3">
+            <span
+              class="rounded-full px-3 py-1 text-xs font-semibold"
+              [class.bg-amber-50]="expense.status === 'PENDING'"
+              [class.text-amber-600]="expense.status === 'PENDING'"
+              [class.bg-emerald-50]="expense.status === 'APPROVED'"
+              [class.text-emerald-600]="expense.status === 'APPROVED'"
+              [class.bg-rose-50]="expense.status === 'REJECTED'"
+              [class.text-rose-600]="expense.status === 'REJECTED'"
+            >
+              {{ expense.status }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right text-sm">
+            <ng-container *ngIf="expense.status === 'PENDING'; else dash">
+              <button
+                class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-600 transition hover:bg-emerald-50"
+                (click)="approve(expense)"
+              >
+                Approve
+              </button>
+              <button
+                class="ml-2 rounded-full border border-rose-200 px-3 py-1 text-rose-600 transition hover:bg-rose-50"
+                (click)="reject(expense)"
+              >
+                Reject
+              </button>
+            </ng-container>
+            <ng-template #dash>—</ng-template>
+          </td>
+        </tr>
+        <tr *ngIf="!filteredExpenses().length">
+          <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+            No expenses for this filter.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ng-template #loadingRows>
+      <div class="p-6 text-center text-sm text-slate-500">Loading expenses…</div>
+    </ng-template>
+  </div>
+
+  <article *ngIf="showForm()" class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <header class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Submit expense</h3>
+        <p class="text-sm text-slate-500">Capture card or reimbursement transactions.</p>
+      </div>
+      <button class="text-sm font-semibold text-slate-500 hover:text-slate-800" (click)="closeForm()">Close</button>
+    </header>
+    <form class="mt-4 grid gap-4 md:grid-cols-2" [formGroup]="form" (ngSubmit)="submitExpense()">
+      <label class="text-sm font-semibold text-slate-600">
+        Category
+        <input
+          type="text"
+          formControlName="category"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+          placeholder="Software, Travel, etc."
+        />
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Amount
+        <input
+          type="number"
+          step="0.01"
+          formControlName="amount"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+        />
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Department
+        <input
+          type="text"
+          formControlName="department"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+        />
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Expense date
+        <input
+          type="date"
+          formControlName="expenseDate"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+        />
+      </label>
+      <label class="text-sm font-semibold text-slate-600 md:col-span-2">
+        Description
+        <textarea
+          rows="3"
+          formControlName="description"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 focus:border-primary-500 focus:outline-none"
+          placeholder="Add supplier details, notes, or project codes."
+        ></textarea>
+      </label>
+      <div class="md:col-span-2 flex items-center justify-between">
+        <div class="text-sm text-rose-600" *ngIf="formError()">{{ formError() }}</div>
+        <button
+          type="submit"
+          class="rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700 disabled:opacity-50"
+          [disabled]="submitting()"
+        >
+          {{ submitting() ? 'Submitting…' : 'Submit expense' }}
+        </button>
+      </div>
+    </form>
+  </article>
+</section>

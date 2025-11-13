@@ -43,9 +43,10 @@ export class SidebarComponent {
       label: 'Finance',
       icon: 'account_balance',
       children: [
-        { label: 'Budgets', icon: 'savings', path: '/finance/budgets' },
+        { label: 'Overview', icon: 'monitoring', path: '/finance/overview' },
+        { label: 'Expenses', icon: 'receipt', path: '/finance/expenses' },
         { label: 'Invoices', icon: 'receipt_long', path: '/finance/invoices' },
-        { label: 'Transactions', icon: 'sync_alt', path: '/finance/tx' },
+        { label: 'Payroll', icon: 'payments', path: '/finance/payroll' },
       ],
     },
     {

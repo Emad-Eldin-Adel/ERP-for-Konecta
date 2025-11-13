@@ -1,0 +1,174 @@
+<section class="space-y-6">
+  <div *ngIf="error()" class="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-700">
+    {{ error() }}
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-4">
+    <article class="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+      <div class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Spent YTD</div>
+      <div class="mt-2 text-3xl font-bold text-slate-900">{{ formatCurrency(summary().spent) }}</div>
+      <p class="text-sm text-slate-500">Total processed across all expense sources.</p>
+    </article>
+    <article class="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+      <div class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Pending</div>
+      <div class="mt-2 text-3xl font-bold text-amber-600">{{ formatCurrency(summary().pending) }}</div>
+      <p class="text-sm text-slate-500">Awaiting approval or documentation.</p>
+    </article>
+    <article class="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+      <div class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Receivables</div>
+      <div class="mt-2 text-3xl font-bold text-emerald-600">{{ formatCurrency(summary().receivables) }}</div>
+      <p class="text-sm text-slate-500">{{ summary().draftInvoices }} invoices not yet sent.</p>
+    </article>
+    <article class="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Payroll Paid</div>
+          <div class="mt-2 text-3xl font-bold text-primary-600">{{ summary().payrollCoverage }}%</div>
+        </div>
+        <span class="material-symbols-outlined rounded-full bg-primary-50 p-3 text-primary-600">flag</span>
+      </div>
+      <p class="text-sm text-slate-500">Coverage for the selected period.</p>
+    </article>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+    <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+      <header class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Top expenses</h2>
+          <p class="text-sm text-slate-500">Highest line items this quarter.</p>
+        </div>
+        <button class="text-sm font-semibold text-primary-600 hover:text-primary-700" (click)="loadOverview()">Refresh</button>
+      </header>
+      <ul class="mt-4 divide-y divide-slate-100">
+        <li *ngFor="let expense of topExpenses(); trackBy: trackExpense" class="flex items-center justify-between py-3">
+          <div>
+            <p class="font-semibold text-slate-900">{{ expense.category || 'General' }}</p>
+            <p class="text-xs text-slate-500">
+              {{ expense.department || 'Company-wide' }} ·
+              {{ (expense.expenseDate || expense.createdAt) | date : 'mediumDate' }}
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-lg font-semibold text-slate-900">{{ formatCurrency(expense.amount) }}</p>
+            <p class="text-xs uppercase tracking-wide text-slate-500">{{ expense.status }}</p>
+          </div>
+        </li>
+        <li *ngIf="!topExpenses().length" class="py-6 text-center text-sm text-slate-500">
+          No expenses recorded yet.
+        </li>
+      </ul>
+    </article>
+
+    <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+      <header class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-semibold text-slate-900">Recent invoices</h2>
+          <p class="text-sm text-slate-500">Tracking the latest billing activity.</p>
+        </div>
+      </header>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100 text-sm">
+          <thead>
+            <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th class="px-2 py-2">Client</th>
+              <th class="px-2 py-2">Amount</th>
+              <th class="px-2 py-2">Status</th>
+              <th class="px-2 py-2">Created</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let invoice of recentInvoices(); trackBy: trackInvoice">
+              <td class="px-2 py-3">
+                <p class="font-semibold text-slate-900">{{ invoice.clientName }}</p>
+                <p class="text-xs text-slate-500">#{{ invoice.id }}</p>
+              </td>
+              <td class="px-2 py-3 font-semibold text-slate-900">{{ formatCurrency(invoice.grandTotal ?? invoice.amount) }}</td>
+              <td class="px-2 py-3">
+                <span class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold"
+                  [class.text-emerald-600]="invoice.status === 'PAID'"
+                  [class.text-amber-600]="invoice.status === 'DRAFT'">
+                  {{ invoice.status }}
+                </span>
+              </td>
+              <td class="px-2 py-3 text-xs text-slate-500">{{ invoice.createdAt | date : 'medium' }}</td>
+            </tr>
+            <tr *ngIf="!recentInvoices().length">
+              <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500">
+                No invoices available.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Payroll snapshot</h2>
+        <p class="text-sm text-slate-500">Monitor disbursements for the selected period.</p>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <label class="text-slate-500" for="periodInput">Period</label>
+        <input
+          id="periodInput"
+          type="month"
+          class="rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+          [value]="period()"
+          (change)="refreshPeriod($any($event.target).value)"
+        />
+        <button
+          class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:text-primary-600"
+          (click)="loadOverview()"
+        >
+          <span class="material-symbols-outlined text-base">refresh</span>
+          Reload
+        </button>
+      </div>
+    </header>
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100 text-sm">
+        <thead>
+          <tr class="text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <th class="px-2 py-2">Employee</th>
+            <th class="px-2 py-2 text-right">Base</th>
+            <th class="px-2 py-2 text-right">Bonuses</th>
+            <th class="px-2 py-2 text-right">Deductions</th>
+            <th class="px-2 py-2 text-right">Net</th>
+            <th class="px-2 py-2">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let row of payrollPreview(); trackBy: trackPayroll">
+            <td class="px-2 py-3">
+              <p class="font-semibold text-slate-900">{{ row.name || ('#' + row.employeeId) }}</p>
+              <p class="text-xs text-slate-500">{{ row.accountMasked || 'No banking details' }}</p>
+            </td>
+            <td class="px-2 py-3 text-right">{{ formatCurrency(row.base) }}</td>
+            <td class="px-2 py-3 text-right text-emerald-600">{{ formatCurrency(row.bonuses) }}</td>
+            <td class="px-2 py-3 text-right text-rose-600">-{{ formatCurrency(row.deductions) }}</td>
+            <td class="px-2 py-3 text-right font-semibold text-slate-900">{{ formatCurrency(row.net) }}</td>
+            <td class="px-2 py-3">
+              <span
+                class="rounded-full px-3 py-1 text-xs font-semibold"
+                [class.bg-emerald-50]="row.paid"
+                [class.text-emerald-600]="row.paid"
+                [class.bg-amber-50]="!row.paid"
+                [class.text-amber-600]="!row.paid"
+              >
+                {{ row.paid ? 'Paid' : 'Pending' }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="!payrollPreview().length">
+            <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">
+              No payroll entries for this period.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
