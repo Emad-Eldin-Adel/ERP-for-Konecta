@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   InviteUserDto,
@@ -9,16 +9,21 @@ import {
   UserRole,
   UserStatus,
 } from '../../core/services/user-management.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../core/services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
   templateUrl: './admin-dashboard.component.html',
-  imports: [CommonModule, NgIf, NgFor, ReactiveFormsModule, DatePipe],
+  imports: [CommonModule, NgIf, NgFor, ReactiveFormsModule, DatePipe, FormsModule],
 })
 export class AdminDashboardComponent implements OnInit {
   private userService = inject(UserManagementService);
   private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   users: UserResponse[] = [];
   summary: UserSummary | null = null;
@@ -31,6 +36,7 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly roles: UserRole[] = ['ADMIN', 'HR', 'FINANCE', 'EMPLOYEE'];
   readonly statuses: UserStatus[] = ['ACTIVE', 'INACTIVE'];
+  currentUserRole: UserRole | null = null;
 
   inviteForm = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -41,6 +47,10 @@ export class AdminDashboardComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.currentUserRole = (this.auth.currentUser?.role as UserRole) ?? null;
+    this.auth.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => (this.currentUserRole = (user?.role as UserRole) ?? null));
     this.refreshData();
   }
 
@@ -132,5 +142,13 @@ export class AdminDashboardComponent implements OnInit {
 
   trackByUserId(_: number, item: UserResponse) {
     return item.id;
+  }
+
+  get canManageRoles() {
+    return this.currentUserRole === 'ADMIN';
+  }
+
+  get canManageStatus() {
+    return this.currentUserRole === 'ADMIN' || this.currentUserRole === 'HR';
   }
 }

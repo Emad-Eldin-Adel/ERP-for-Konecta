@@ -1,5 +1,5 @@
 // src/app/core/layout/nav/nav.ts
-import { Component, inject } from '@angular/core';
+import { Component, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -25,6 +25,7 @@ export class NavbarComponent {
 
   private router = inject(Router);
   private auth = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   constructor() {
     // set initial flags
@@ -35,7 +36,7 @@ export class NavbarComponent {
       .subscribe((e) => this.setFlags(e.urlAfterRedirects));
 
     this.auth.currentUser$
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => this.applyUser(user));
   }
 

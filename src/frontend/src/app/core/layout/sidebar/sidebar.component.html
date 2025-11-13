@@ -29,7 +29,7 @@
                 <ng-template #srOnlyDash><span class="sr-only">Dashboard</span></ng-template>
             </a>
         </li>
-        <li *ngFor="let item of computedItems; let i = index">
+        <li *ngFor="let item of visibleItems; let i = index">
             <!-- Parent with link (no children) -->
             <ng-container *ngIf="item.path && !item.children; else nonLinkItem">
                 <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"

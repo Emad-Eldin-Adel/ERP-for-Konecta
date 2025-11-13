@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -12,6 +11,12 @@ import org.springframework.web.client.HttpStatusCodeException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Enumeration;
+import java.time.Duration;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 @RestController
 @RequestMapping("/api")
@@ -21,9 +26,17 @@ public class ProxyController {
     private static final Logger log = LoggerFactory.getLogger(ProxyController.class);
 
     public ProxyController(RestTemplateBuilder builder) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(12000);
-        factory.setReadTimeout(200000);
+        int connectTimeoutMs = (int) Duration.ofSeconds(12).toMillis();
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(connectTimeoutMs))
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeoutMs))
+                .setResponseTimeout(Timeout.ofSeconds(200))
+                .build();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
         this.restTemplate = builder.requestFactory(() -> factory).build();
     }
 

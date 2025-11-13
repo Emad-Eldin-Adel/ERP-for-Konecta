@@ -43,6 +43,10 @@
         </div>
       </div>
 
+      <div *ngIf="!canManageRoles" class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-900">
+        You currently have read-only access. Contact an administrator to change roles or invite members.
+      </div>
+
       <div *ngIf="userError()" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
         {{ userError() }}
       </div>
@@ -65,13 +69,20 @@
                 <p class="text-xs text-slate-500">{{ user.email }}</p>
               </td>
               <td class="whitespace-nowrap px-3 py-3">
-                <select
-                  class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm"
-                  [value]="user.role"
-                  (change)="updateRole(user, $any($event.target).value)"
-                >
-                  <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
-                </select>
+                <ng-container *ngIf="canManageRoles; else readonlyRole">
+                  <select
+                    class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm"
+                    [ngModel]="user.role"
+                    (ngModelChange)="updateRole(user, $event)"
+                  >
+                    <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+                  </select>
+                </ng-container>
+                <ng-template #readonlyRole>
+                  <span class="inline-flex items-center rounded-lg border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-600 bg-slate-50">
+                    {{ user.role }}
+                  </span>
+                </ng-template>
               </td>
               <td class="whitespace-nowrap px-3 py-3">
                 <span
@@ -85,14 +96,19 @@
                 {{ user.createdAt | date: 'mediumDate' }}
               </td>
               <td class="whitespace-nowrap px-3 py-3">
-                <button
-                  type="button"
-                  class="rounded-lg border px-3 py-1 text-xs font-semibold transition"
-                  [ngClass]="user.status === 'ACTIVE' ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
-                  (click)="toggleStatus(user)"
-                >
-                  {{ user.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
-                </button>
+                <ng-container *ngIf="canManageStatus; else readonlyAction">
+                  <button
+                    type="button"
+                    class="rounded-lg border px-3 py-1 text-xs font-semibold transition"
+                    [ngClass]="user.status === 'ACTIVE' ? 'border-red-200 text-red-600 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
+                    (click)="toggleStatus(user)"
+                  >
+                    {{ user.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                  </button>
+                </ng-container>
+                <ng-template #readonlyAction>
+                  <span class="text-xs font-medium text-slate-400">No actions</span>
+                </ng-template>
               </td>
             </tr>
             <tr *ngIf="!loadingUsers() && users.length === 0">

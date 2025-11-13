@@ -1,9 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService, AuthUser } from '../../services/auth.service';
 
-type NavChild = { label: string; icon: string; path?: string };
-type NavItem = { label: string; icon: string; path?: string; children?: NavChild[] };
+type UserRole = AuthUser['role'];
+type NavChild = { label: string; icon: string; path?: string; roles?: UserRole[] };
+type NavItem = { label: string; icon: string; path?: string; roles?: UserRole[]; children?: NavChild[] };
 
 @Component({
   selector: 'app-sidebar',
@@ -33,15 +36,22 @@ export class SidebarComponent implements OnInit {
     {
       label: 'HR',
       icon: 'badge',
+      roles: ['ADMIN', 'HR'],
       children: [
-        { label: 'Users', icon: 'group', path: '/hr/users' },
+        { label: 'Employees', icon: 'group', path: '/hr/employees' },
+        { label: 'Departments', icon: 'corporate_fare', path: '/hr/departments' },
+        { label: 'Jobs', icon: 'work', path: '/hr/jobs' },
         { label: 'Attendance', icon: 'event_available', path: '/hr/attendance' },
-        { label: 'Leaves', icon: 'beach_access', path: '/hr/leaves' },
+        { label: 'Leave', icon: 'beach_access', path: '/hr/leave' },
+        { label: 'Performance', icon: 'insights', path: '/hr/performance' },
+        { label: 'Training', icon: 'school', path: '/hr/training' },
+        { label: 'Offboarding', icon: 'logout', path: '/hr/offboarding' },
       ],
     },
     {
       label: 'Finance',
       icon: 'account_balance',
+      roles: ['ADMIN', 'FINANCE'],
       children: [
         { label: 'Overview', icon: 'monitoring', path: '/finance/overview' },
         { label: 'Expenses', icon: 'receipt', path: '/finance/expenses' },
@@ -52,6 +62,7 @@ export class SidebarComponent implements OnInit {
     {
       label: 'Admin',
       icon: 'admin_panel_settings',
+      roles: ['ADMIN'],
       children: [
         { label: 'Users', icon: 'groups', path: '/admin/users' },
         { label: 'Roles', icon: 'workspace_premium', path: '/admin/roles' },
@@ -60,15 +71,24 @@ export class SidebarComponent implements OnInit {
     },
   ];
 
+  role: UserRole | null = null;
+  visibleItems: NavItem[] = [];
+
   /** expanded group state */
   private expanded = new Set<number>();
+  private auth = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.computedItems.forEach((item, index) => {
-      if (item.children?.length) {
-        this.expanded.add(index);
-      }
-    });
+    this.auth.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.role = user?.role ?? null;
+        this.updateVisibleItems();
+      });
+
+    this.role = this.auth.currentUser?.role ?? null;
+    this.updateVisibleItems();
   }
 
   toggleGroup(i: number) {
@@ -94,5 +114,41 @@ export class SidebarComponent implements OnInit {
     if (item.path) return item.path;
     const firstChild = item.children?.find((child) => !!child.path);
     return firstChild?.path ?? this.dashPath;
+  }
+
+  private updateVisibleItems() {
+    this.visibleItems = this.computedItems
+      .map((item) => this.filterForRole(item))
+      .filter((item): item is NavItem => !!item);
+
+    this.expanded.clear();
+    this.visibleItems.forEach((item, index) => {
+      if (item.children?.length) {
+        this.expanded.add(index);
+      }
+    });
+  }
+
+  private filterForRole(item: NavItem): NavItem | null {
+    if (!this.isRoleAllowed(item.roles)) {
+      return null;
+    }
+
+    const filteredChildren = item.children
+      ?.map((child) => (this.isRoleAllowed(child.roles) ? child : null))
+      .filter((child): child is NavChild => !!child);
+
+    if (item.children && (!filteredChildren || filteredChildren.length === 0) && !item.path) {
+      return null;
+    }
+
+    return { ...item, children: filteredChildren ?? undefined };
+  }
+
+  private isRoleAllowed(roles?: UserRole[]): boolean {
+    if (!roles || roles.length === 0) {
+      return !!this.role;
+    }
+    return this.role ? roles.includes(this.role) : false;
   }
 }
