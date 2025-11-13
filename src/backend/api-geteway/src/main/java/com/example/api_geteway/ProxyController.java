@@ -71,7 +71,7 @@ public class ProxyController {
     public ResponseEntity<byte[]> proxyFinance(HttpMethod method,
             HttpServletRequest request,
             @RequestBody(required = false) byte[] body) {
-        String upstreamBase = "http://finance-service:8085/api/finance";
+        String upstreamBase = "http://finance-service:5288/api/finance";
         return forward(upstreamBase, method, request, body);
     }
 
@@ -79,13 +79,11 @@ public class ProxyController {
             HttpMethod method,
             HttpServletRequest request,
             byte[] body) {
-        String fullPath = request.getRequestURI(); // e.g. /api/auth/login
+        String fullPath = request.getRequestURI();
         String prefix = "/api";
-        String suffix = fullPath.startsWith(prefix) ? fullPath.substring(prefix.length()) : fullPath; // e.g.
-                                                                                                      // /hr/employees
+        String suffix = fullPath.startsWith(prefix) ? fullPath.substring(prefix.length()) : fullPath;
         String query = request.getQueryString();
-        // Remove the first path segment (/auth|/hr|/finance|/reporting) to avoid
-        // duplication with upstreamBase
+
         String cleaned = suffix.replaceFirst("^/(auth|hr|finance)", "");
         String target = upstreamBase + cleaned + (query != null ? "?" + query : "");
 
