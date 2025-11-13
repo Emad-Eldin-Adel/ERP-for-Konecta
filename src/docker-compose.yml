@@ -90,6 +90,56 @@ services:
     depends_on: [config, discovery]
     networks: [konecta-net]
 
+  finance-postgres:
+    image: postgres:16
+    container_name: finance-postgres
+    environment:
+      POSTGRES_DB: finance_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5435:5432"
+    volumes:
+      - finance_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d finance_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [konecta-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks: [konecta-net]
+
+  finance-service:
+    build: ./backend/finance-service
+    ports: ["8085:8085"]
+    environment:
+      ConnectionStrings__FinanceDb: Host=finance-postgres;Port=5432;Database=finance_db;Username=postgres;Password=1234
+      Jwt__Secret: i0eCF0g/9rj5xLQOpPT2xWHDyKtqzjnE220yTdrjJwI8/w1NtH7xB9/T8MqqHaAn
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+      RabbitMq__UseSsl: "false"
+      Hr__PrimaryBaseUrl: http://api-gateway:8080/api/hr
+    depends_on:
+      finance-postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      config:
+        condition: service_started
+      discovery:
+        condition: service_started
+    networks: [konecta-net]
+
   frontend:
     build: ./frontend
     ports: ["4200:80"]
@@ -103,3 +153,4 @@ networks:
 volumes:
   pgdata:
   hr_pgdata:
+  finance_pgdata:
