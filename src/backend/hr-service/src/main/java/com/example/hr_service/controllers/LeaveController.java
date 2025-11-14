@@ -99,9 +99,23 @@ public class LeaveController {
     }
 
     private LeaveResponse toResponse(LeaveRequest r) {
+        Employee employee = r.getEmployee();
+        String fullName = null;
+        String email = null;
+        if (employee != null) {
+            String first = employee.getFirstName() != null ? employee.getFirstName().trim() : "";
+            String last = employee.getLastName() != null ? employee.getLastName().trim() : "";
+            fullName = (first + " " + last).trim();
+            email = employee.getEmail();
+            if ((fullName == null || fullName.isBlank()) && email != null) {
+                fullName = email;
+            }
+        }
         return LeaveResponse.builder()
                 .id(r.getId())
-                .employeeId(r.getEmployee() != null ? r.getEmployee().getId() : null)
+                .employeeId(employee != null ? employee.getId() : null)
+                .employeeName(fullName)
+                .employeeEmail(email)
                 .startDate(r.getStartDate())
                 .endDate(r.getEndDate())
                 .reason(r.getReason())

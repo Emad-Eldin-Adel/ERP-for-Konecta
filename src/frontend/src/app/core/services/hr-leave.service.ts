@@ -7,10 +7,18 @@ export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export interface HrLeave {
   id: number;
   employeeId: number;
+  employeeName: string | null;
+  employeeEmail: string | null;
   startDate: string;
   endDate: string;
   reason: string;
   status: LeaveStatus;
+}
+
+export interface LeaveRequestPayload {
+  startDate: string;
+  endDate: string;
+  reason: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,5 +36,13 @@ export class HrLeaveService {
 
   reject(id: number) {
     return this.http.put<HrLeave>(`${this.base}/${id}/reject`, {});
+  }
+
+  mine() {
+    return this.http.get<HrLeave[]>(`${this.base}/me`);
+  }
+
+  request(payload: LeaveRequestPayload) {
+    return this.http.post<HrLeave>(this.base, payload);
   }
 }

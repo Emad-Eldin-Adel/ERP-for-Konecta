@@ -13,6 +13,8 @@ import java.time.LocalDate;
 public class LeaveResponse {
     private Long id;
     private Long employeeId;
+    private String employeeName;
+    private String employeeEmail;
     private LocalDate startDate;
     private LocalDate endDate;
     private String reason;

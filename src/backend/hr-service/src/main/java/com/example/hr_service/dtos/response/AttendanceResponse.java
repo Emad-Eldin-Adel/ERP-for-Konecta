@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +14,11 @@ import java.time.LocalDate;
 public class AttendanceResponse {
     private Long id;
     private Long employeeId;
+    private String employeeName;
+    private String employeeEmail;
     private LocalDate date;
     private Boolean present;
     private Double workingHours;
+    private LocalDateTime checkInAt;
+    private LocalDateTime checkOutAt;
 }

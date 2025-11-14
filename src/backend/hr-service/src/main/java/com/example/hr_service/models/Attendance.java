@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -20,6 +21,8 @@ public class Attendance {
     private LocalDate date;
     private Boolean present;
     private Double workingHours;
+    private LocalDateTime checkInAt;
+    private LocalDateTime checkOutAt;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

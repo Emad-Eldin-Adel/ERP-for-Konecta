@@ -30,7 +30,12 @@
       </thead>
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let leave of filteredLeaves">
-          <td class="px-4 py-3 font-semibold text-slate-900">#{{ leave.employeeId }}</td>
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">
+              {{ leave.employeeName || (leave.employeeId ? ('#' + leave.employeeId) : 'Unknown employee') }}
+            </p>
+            <p class="text-xs text-slate-500">{{ leave.employeeEmail || 'Email not provided' }}</p>
+          </td>
           <td class="px-4 py-3 text-slate-600">{{ leave.startDate }} → {{ leave.endDate }}</td>
           <td class="px-4 py-3 text-slate-600">{{ leave.reason || '—' }}</td>
           <td class="px-4 py-3">

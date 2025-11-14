@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HrAttendance, HrAttendanceService } from '../../../core/services/hr-attendance.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { HrAttendance, HrAttendanceService } from '../../../core/services/hr-att
   templateUrl: './attendance.component.html',
   imports: [CommonModule, ReactiveFormsModule],
 })
-export class HrAttendanceComponent {
+export class HrAttendanceComponent implements OnInit {
   private service = inject(HrAttendanceService);
   private fb = inject(FormBuilder);
 
@@ -18,17 +18,38 @@ export class HrAttendanceComponent {
   error = signal('');
 
   form = this.fb.group({
-    employeeId: this.fb.nonNullable.control<number | null>(null, Validators.required),
+    query: this.fb.control(''),
   });
 
+  ngOnInit(): void {
+    this.loadRecords();
+  }
+
   fetch() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    const raw = (this.form.value.query ?? '').toString().trim();
+    if (!raw) {
+      this.loadRecords();
       return;
     }
-    const employeeId = Number(this.form.value.employeeId);
     this.loading.set(true);
-    this.service.byEmployee(employeeId).subscribe({
+    this.service.list(raw).subscribe({
+      next: (attendance) => {
+        this.records.set(attendance);
+        this.error.set('');
+      },
+      error: (err) => this.error.set(err?.error?.message || 'Unable to load attendance'),
+      complete: () => this.loading.set(false),
+    });
+  }
+
+  reset() {
+    this.form.reset();
+    this.loadRecords();
+  }
+
+  private loadRecords(search?: string) {
+    this.loading.set(true);
+    this.service.list(search).subscribe({
       next: (attendance) => {
         this.records.set(attendance);
         this.error.set('');

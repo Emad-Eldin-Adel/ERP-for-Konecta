@@ -20,6 +20,7 @@ import { FinanceOverviewComponent } from './pages/finance/overview/finance-overv
 import { FinanceExpensesComponent } from './pages/finance/expenses/finance-expenses.component';
 import { FinanceInvoicesComponent } from './pages/finance/invoices/finance-invoices.component';
 import { FinancePayrollComponent } from './pages/finance/payroll/finance-payroll.component';
+import { EmployeeSelfServiceComponent } from './pages/employee/self-service/employee-self-service.component';
 
 export const routes: Routes = [
   {
@@ -57,6 +58,12 @@ export const routes: Routes = [
           { path: 'invoices', component: FinanceInvoicesComponent },
           { path: 'payroll', component: FinancePayrollComponent },
         ],
+      },
+      {
+        path: 'workspace',
+        component: EmployeeSelfServiceComponent,
+        canActivate: [rolesGuard],
+        data: { roles: ['EMPLOYEE'] },
       },
     ],
   },

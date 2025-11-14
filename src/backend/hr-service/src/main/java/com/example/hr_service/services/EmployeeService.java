@@ -24,7 +24,7 @@ public class EmployeeService {
     public Employee findByEmail(String email) {
         if (email == null || email.isBlank())
             return null;
-        return employeeRepository.findByEmail(email).orElse(null);
+        return employeeRepository.findByEmailIgnoreCase(email).orElse(null);
     }
 
     public Employee create(Employee employee) {
@@ -50,7 +50,7 @@ public class EmployeeService {
 
     public Employee ensureByEmail(String email, String firstName, String lastName, String phone, String position,
             Department dept, Double salary, Double workingHours) {
-        return employeeRepository.findByEmail(email)
+        return employeeRepository.findByEmailIgnoreCase(email)
                 .map(existing -> {
                     // Update basic fields if provided; keep existing otherwise
                     if (firstName != null && !firstName.isBlank())

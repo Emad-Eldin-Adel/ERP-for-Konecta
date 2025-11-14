@@ -34,6 +34,12 @@ export class SidebarComponent implements OnInit {
   /** menu model (replace with your real routes) */
   computedItems: NavItem[] = [
     {
+      label: 'My Workspace',
+      icon: 'work',
+      roles: ['EMPLOYEE'],
+      path: '/workspace'
+    },
+    {
       label: 'HR',
       icon: 'badge',
       roles: ['ADMIN', 'HR'],

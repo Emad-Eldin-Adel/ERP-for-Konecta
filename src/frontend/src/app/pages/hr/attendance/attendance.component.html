@@ -2,37 +2,57 @@
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
       <h2 class="text-xl font-semibold text-slate-900">Attendance tracker</h2>
-      <p class="text-sm text-slate-500">Look up an employee’s presence history.</p>
+      <p class="text-sm text-slate-500">Look up an employee's presence history.</p>
     </div>
     <form class="flex flex-wrap items-center gap-2" [formGroup]="form" (ngSubmit)="fetch()">
-      <input type="number" formControlName="employeeId" placeholder="Employee ID" class="w-36 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
-      <button type="submit" class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">Load</button>
+      <input type="text" formControlName="query" placeholder="Search by name, email, or ID"
+        class="w-72 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+        autocomplete="off" />
+      <button type="submit"
+        class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700">Search</button>
+      <button type="button"
+        class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+        (click)="reset()">Reset</button>
     </form>
+    <p class="text-xs text-slate-400">All attendance records load automatically. Use the search to narrow by person.</p>
   </div>
-  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">{{ error() }}</div>
+  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+    {{ error() }}
+  </div>
 
   <div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-slate-200 text-sm">
       <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
         <tr>
+          <th class="px-4 py-3">Employee</th>
           <th class="px-4 py-3">Date</th>
+          <th class="px-4 py-3">Check-in</th>
+          <th class="px-4 py-3">Check-out</th>
           <th class="px-4 py-3">Presence</th>
           <th class="px-4 py-3">Hours</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let item of records()">
+          <td class="px-4 py-3">
+            <p class="font-semibold text-slate-900">{{ item.employeeName || (item.employeeId ? ('#' + item.employeeId) : 'Unknown') }}</p>
+            <p class="text-xs text-slate-500">{{ item.employeeEmail || 'Not provided' }}</p>
+          </td>
           <td class="px-4 py-3 font-medium text-slate-900">{{ item.date }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ item.checkInAt || '--' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ item.checkOutAt || '--' }}</td>
           <td class="px-4 py-3">
             <span class="rounded-full px-3 py-1 text-xs font-semibold"
               [ngClass]="item.present ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
               {{ item.present ? 'Present' : 'Absent' }}
             </span>
           </td>
-          <td class="px-4 py-3 text-slate-600">{{ item.workingHours ?? '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ item.workingHours ?? '--' }}</td>
         </tr>
         <tr *ngIf="records().length === 0">
-          <td colspan="3" class="px-4 py-6 text-center text-sm text-slate-500">{{ loading() ? 'Loading records…' : 'No attendance captured yet.' }}</td>
+          <td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500">
+            {{ loading() ? 'Loading records...' : 'No attendance captured yet.' }}
+          </td>
         </tr>
       </tbody>
     </table>
