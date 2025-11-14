@@ -77,4 +77,18 @@ public class AccountService(FinanceDbContext dbContext) : IAccountService
             .Where(a => a.Email != null && lower.Contains(a.Email.ToLower()))
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Account>> FindByUsernamesAsync(IEnumerable<string> usernames, CancellationToken cancellationToken)
+    {
+        var lower = usernames.Where(u => !string.IsNullOrWhiteSpace(u))
+            .Select(u => u.ToLower())
+            .Distinct()
+            .ToArray();
+
+        if (lower.Length == 0) return Array.Empty<Account>();
+
+        return await dbContext.Accounts
+            .Where(a => a.Username != null && lower.Contains(a.Username.ToLower()))
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -10,4 +10,5 @@ public interface IAccountService
     Task<Account?> FindByUsernameAsync(string username, CancellationToken cancellationToken);
     Task<Account?> FindByUserIdAsync(long userId, CancellationToken cancellationToken);
     Task<IReadOnlyList<Account>> FindByEmailsAsync(IEnumerable<string> emails, CancellationToken cancellationToken);
+    Task<IReadOnlyList<Account>> FindByUsernamesAsync(IEnumerable<string> usernames, CancellationToken cancellationToken);
 }

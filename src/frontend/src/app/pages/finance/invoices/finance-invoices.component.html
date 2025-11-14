@@ -5,13 +5,24 @@
         <h2 class="text-xl font-semibold text-slate-900">Billing</h2>
         <p class="text-sm text-slate-500">Create estimates, send invoices, and capture status.</p>
       </div>
-      <button
-        class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
-        (click)="openForm()"
-      >
-        <span class="material-symbols-outlined text-base">add</span>
-        New invoice
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          (click)="exportInvoices()"
+          [disabled]="!invoices().length"
+        >
+          <span class="material-symbols-outlined text-base">download</span>
+          Export CSV
+        </button>
+        <button
+          class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
+          (click)="openForm()"
+        >
+          <span class="material-symbols-outlined text-base">add</span>
+          New invoice
+        </button>
+      </div>
     </div>
     <div class="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm text-emerald-700">
       <div class="font-semibold">{{ formatCurrency(totalDraft()) }} outstanding</div>
@@ -68,21 +79,40 @@
             </span>
           </td>
           <td class="px-4 py-3 text-right text-sm">
-            <button
-              *ngIf="invoice.status === 'DRAFT'"
-              class="rounded-full border border-primary-200 px-3 py-1 text-primary-600 hover:bg-primary-50"
-              (click)="sendInvoice(invoice)"
-            >
-              Send
-            </button>
-            <button
-              *ngIf="invoice.status === 'SENT'"
-              class="ml-2 rounded-full border border-emerald-200 px-3 py-1 text-emerald-600 hover:bg-emerald-50"
-              (click)="markPaid(invoice)"
-            >
-              Mark paid
-            </button>
-            <span *ngIf="invoice.status === 'PAID'" class="text-slate-400">—</span>
+            <div class="flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                class="rounded-full border border-slate-200 px-3 py-1 text-slate-600 hover:bg-slate-50"
+                (click)="editInvoice(invoice)"
+              >
+                Edit
+              </button>
+              <button
+                *ngIf="invoice.pdfAttached"
+                type="button"
+                class="rounded-full border border-indigo-200 px-3 py-1 text-indigo-600 hover:bg-indigo-50"
+                (click)="downloadPdf(invoice)"
+              >
+                PDF
+              </button>
+              <button
+                *ngIf="invoice.status === 'DRAFT'"
+                type="button"
+                class="rounded-full border border-primary-200 px-3 py-1 text-primary-600 hover:bg-primary-50"
+                (click)="sendInvoice(invoice)"
+              >
+                Send
+              </button>
+              <button
+                *ngIf="invoice.status === 'SENT'"
+                type="button"
+                class="rounded-full border border-emerald-200 px-3 py-1 text-emerald-600 hover:bg-emerald-50"
+                (click)="markPaid(invoice)"
+              >
+                Mark paid
+              </button>
+              <span *ngIf="invoice.status === 'PAID'" class="text-slate-400">—</span>
+            </div>
           </td>
         </tr>
         <tr *ngIf="!filteredInvoices().length">
@@ -100,8 +130,13 @@
   <article *ngIf="showForm()" class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
     <header class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-slate-900">Draft invoice</h3>
-        <p class="text-sm text-slate-500">Fill in line items, we’ll calculate totals automatically.</p>
+        <h3 class="text-lg font-semibold text-slate-900">{{ formTitle() }}</h3>
+        <p class="text-sm text-slate-500" *ngIf="editingInvoiceId(); else newInvoiceCopy">
+          Editing invoice #{{ editingInvoiceId() }}. Update line items or attach a replacement PDF.
+        </p>
+        <ng-template #newInvoiceCopy>
+          <p class="text-sm text-slate-500">Fill in line items, we’ll calculate totals automatically.</p>
+        </ng-template>
       </div>
       <button class="text-sm font-semibold text-slate-500 hover:text-slate-800" (click)="closeForm()">Close</button>
     </header>
@@ -216,14 +251,44 @@
         </button>
       </div>
 
+      <section class="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+        <label class="text-sm font-semibold text-slate-600">
+          Attach PDF
+          <input
+            type="file"
+            accept="application/pdf"
+            class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
+            (change)="onPdfSelected($event)"
+          />
+        </label>
+        <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+          <span *ngIf="selectedPdf?.name">Selected: {{ selectedPdf?.name }}</span>
+          <button
+            type="button"
+            class="text-xs font-semibold text-rose-500 hover:text-rose-700"
+            (click)="clearPdfSelection()"
+            *ngIf="selectedPdf || pdfPreviewUrl()"
+          >
+            Remove PDF
+          </button>
+        </div>
+        <p class="mt-2 text-sm text-rose-600" *ngIf="pdfError()">{{ pdfError() }}</p>
+        <div *ngIf="pdfPreviewUrl() as preview" class="mt-4">
+          <iframe [src]="preview" class="h-64 w-full rounded-2xl border border-slate-200"></iframe>
+        </div>
+      </section>
+
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="text-sm text-rose-600" *ngIf="formError()">{{ formError() }}</div>
+        <div class="space-y-1 text-sm">
+          <div class="text-rose-600" *ngIf="formError()">{{ formError() }}</div>
+          <div class="text-slate-500" *ngIf="uploadingPdf()">Uploading PDF…</div>
+        </div>
         <button
           type="submit"
           class="rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700 disabled:opacity-50"
           [disabled]="submitting()"
         >
-          {{ submitting() ? 'Saving…' : 'Save draft' }}
+          {{ submitting() ? 'Saving…' : (editingInvoiceId() ? 'Save changes' : 'Save draft') }}
         </button>
       </div>
     </form>

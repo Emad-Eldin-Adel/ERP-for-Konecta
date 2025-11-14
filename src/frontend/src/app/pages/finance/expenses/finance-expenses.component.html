@@ -5,13 +5,32 @@
         <h2 class="text-xl font-semibold text-slate-900">Operational spend</h2>
         <p class="text-sm text-slate-500">Review requests and keep approvals moving.</p>
       </div>
-      <button
-        class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
-        (click)="openForm()"
-      >
-        <span class="material-symbols-outlined text-base">add</span>
-        New expense
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          class="inline-flex items-center gap-2 rounded-2xl border border-primary-200 px-4 py-2 text-sm font-semibold text-primary-600 hover:bg-primary-50"
+          type="button"
+          (click)="openImportPanel()"
+        >
+          <span class="material-symbols-outlined text-base">upload</span>
+          Import
+        </button>
+        <button
+          class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          type="button"
+          (click)="exportExpenses()"
+          [disabled]="!expenses().length"
+        >
+          <span class="material-symbols-outlined text-base">download</span>
+          Export CSV
+        </button>
+        <button
+          class="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700"
+          (click)="openForm()"
+        >
+          <span class="material-symbols-outlined text-base">add</span>
+          New expense
+        </button>
+      </div>
     </div>
     <div class="mt-4 grid gap-4 sm:grid-cols-4 text-center">
       <div class="rounded-2xl border border-slate-100 bg-white py-3">
@@ -49,6 +68,88 @@
     {{ error() }}
   </div>
 
+  <article *ngIf="showImport()" class="rounded-3xl border border-primary-100 bg-white/90 p-5 shadow-sm">
+    <header class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Import departmental expenses</h3>
+        <p class="text-sm text-slate-500">Upload CSV or Excel exports from accounting to pre-fill large batches.</p>
+      </div>
+      <button class="text-sm font-semibold text-slate-500 hover:text-slate-800" type="button" (click)="closeImportPanel()">
+        Close
+      </button>
+    </header>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <label class="text-sm font-semibold text-slate-600 md:col-span-2">
+        File
+        <input
+          type="file"
+          accept=".csv,.xls,.xlsx"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
+          (change)="onImportFileSelected($event)"
+        />
+        <span class="mt-1 block text-xs text-slate-400" *ngIf="importFile()?.name">Selected: {{ importFile()?.name }}</span>
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Status on import
+        <select
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
+          [value]="importStatus()"
+          (change)="setImportStatus($any($event.target).value)"
+        >
+          <option *ngFor="let status of importStatuses" [value]="status">{{ status }}</option>
+        </select>
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Date format
+        <input
+          type="text"
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
+          [value]="importDateFormat()"
+          (input)="importDateFormat.set($any($event.target).value)"
+          placeholder="M/d/yyyy"
+        />
+      </label>
+      <label class="text-sm font-semibold text-slate-600">
+        Mode
+        <select
+          class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
+          [value]="importMode()"
+          (change)="setImportMode($any($event.target).value)"
+        >
+          <option *ngFor="let mode of importModes" [value]="mode">{{ mode }}</option>
+        </select>
+      </label>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="text-sm text-rose-600" *ngIf="importError()">{{ importError() }}</div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs uppercase tracking-wide text-slate-400" *ngIf="importing()">Uploading…</span>
+        <button
+          class="rounded-2xl bg-primary-600 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 hover:bg-primary-700 disabled:opacity-60"
+          type="button"
+          (click)="startImport()"
+          [disabled]="importing()"
+        >
+          {{ importing() ? 'Importing…' : 'Start import' }}
+        </button>
+      </div>
+    </div>
+    <section *ngIf="importSummary() as summary" class="mt-4 rounded-2xl border border-slate-100 bg-slate-50/70 p-4 text-sm text-slate-700">
+      <p class="font-semibold text-slate-900">Import summary</p>
+      <ul class="mt-2 space-y-1">
+        <li>Inserted: <span class="font-semibold text-emerald-600">{{ summary.inserted }}</span></li>
+        <li>Updated: <span class="font-semibold text-primary-600">{{ summary.updated }}</span></li>
+        <li>Skipped: <span class="font-semibold text-slate-600">{{ summary.skipped }}</span></li>
+      </ul>
+      <div *ngIf="summary.errors?.length" class="mt-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-800">
+        <p class="font-semibold">Rows with issues</p>
+        <ul class="mt-1 list-disc pl-4">
+          <li *ngFor="let err of summary.errors">{{ err }}</li>
+        </ul>
+      </div>
+    </section>
+  </article>
+
   <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
     <table class="min-w-full divide-y divide-slate-100 text-sm">
       <thead>
@@ -62,12 +163,13 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else loadingRows">
-        <tr *ngFor="let expense of filteredExpenses(); trackBy: trackExpense">
-          <td class="px-4 py-3">
-            <p class="font-semibold text-slate-900">{{ expense.category || 'General' }}</p>
-            <p class="text-xs text-slate-500">{{ expense.description || '—' }}</p>
-          </td>
-          <td class="px-4 py-3 text-sm text-slate-600">{{ expense.department || 'Company' }}</td>
+        <ng-container *ngIf="filteredExpenses().length; else noExpenses">
+          <tr *ngFor="let expense of paginatedExpenses(); trackBy: trackExpense">
+            <td class="px-4 py-3">
+              <p class="font-semibold text-slate-900">{{ expense.category || 'General' }}</p>
+              <p class="text-xs text-slate-500">{{ expense.description || '—' }}</p>
+            </td>
+            <td class="px-4 py-3 text-sm text-slate-600">{{ expense.department || 'Company' }}</td>
           <td class="px-4 py-3 font-semibold text-slate-900">{{ formatCurrency(expense.amount) }}</td>
           <td class="px-4 py-3 text-xs text-slate-500">{{ expense.createdAt | date : 'medium' }}</td>
           <td class="px-4 py-3">
@@ -100,17 +202,54 @@
             </ng-container>
             <ng-template #dash>—</ng-template>
           </td>
-        </tr>
-        <tr *ngIf="!filteredExpenses().length">
-          <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
-            No expenses for this filter.
-          </td>
-        </tr>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
+    <ng-template #noExpenses>
+      <tr>
+        <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500">
+          No expenses for this filter.
+        </td>
+      </tr>
+    </ng-template>
     <ng-template #loadingRows>
       <div class="p-6 text-center text-sm text-slate-500">Loading expenses…</div>
     </ng-template>
+    <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 px-4 py-3 text-sm text-slate-600">
+      <div>{{ pageInfo() }}</div>
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2">
+          Rows per page
+          <select
+            class="rounded-xl border border-slate-200 px-3 py-1 text-sm focus:border-primary-500 focus:outline-none"
+            [value]="pageSize()"
+            (change)="changePageSize($any($event.target).value)"
+          >
+            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+          </select>
+        </label>
+        <div class="flex items-center gap-1 font-semibold">
+          Page {{ page() }} / {{ totalPages() }}
+        </div>
+        <button
+          class="rounded-full border border-slate-200 px-3 py-1 hover:bg-slate-50 disabled:opacity-40"
+          type="button"
+          (click)="prevPage()"
+          [disabled]="page() === 1"
+        >
+          Prev
+        </button>
+        <button
+          class="rounded-full border border-slate-200 px-3 py-1 hover:bg-slate-50 disabled:opacity-40"
+          type="button"
+          (click)="nextPage()"
+          [disabled]="page() >= totalPages()"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
   </div>
 
   <article *ngIf="showForm()" class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">

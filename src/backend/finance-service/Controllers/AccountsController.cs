@@ -20,7 +20,7 @@ public class AccountsController(IAccountService accountService, IJwtTokenService
     }
 
     [HttpGet("by-email")]
-    [Authorize(Roles = "ADMIN,FINANCE")]
+    [Authorize(Roles = "ADMIN,FINANCE,HR")]
     public async Task<ActionResult<AccountResponse>> ByEmail([FromQuery] string email, CancellationToken cancellationToken)
     {
         var account = await accountService.FindByEmailAsync(email, cancellationToken);
@@ -44,10 +44,18 @@ public class AccountsController(IAccountService accountService, IJwtTokenService
     }
 
     [HttpPost("by-emails")]
-    [Authorize(Roles = "ADMIN,FINANCE")]
+    [Authorize(Roles = "ADMIN,FINANCE,HR")]
     public async Task<ActionResult<IReadOnlyList<AccountResponse>>> ByEmails([FromBody] List<string> emails, CancellationToken cancellationToken)
     {
         var accounts = await accountService.FindByEmailsAsync(emails, cancellationToken);
+        return Ok(accounts.Select(ToResponse).ToList());
+    }
+
+    [HttpPost("by-usernames")]
+    [Authorize(Roles = "ADMIN,FINANCE,HR")]
+    public async Task<ActionResult<IReadOnlyList<AccountResponse>>> ByUsernames([FromBody] List<string> usernames, CancellationToken cancellationToken)
+    {
+        var accounts = await accountService.FindByUsernamesAsync(usernames, cancellationToken);
         return Ok(accounts.Select(ToResponse).ToList());
     }
 

@@ -76,6 +76,25 @@ export interface PayrollOverviewRow {
   cardType: string | null;
 }
 
+export interface PayrollRecord {
+  id: number;
+  employeeId: number;
+  period: string;
+  baseSalary: number | null;
+  bonuses: number | null;
+  deductions: number | null;
+  netSalary: number | null;
+  processedDate: string | null;
+}
+
+export interface PayrollCalculationRequest {
+  employeeId: number;
+  period: string;
+  baseSalary?: number | null;
+  bonuses?: number | null;
+  deductions?: number | null;
+}
+
 export interface ImportSummary {
   inserted: number;
   updated: number;
@@ -100,6 +119,27 @@ export class FinanceService {
     return this.http.post<FinanceExpense>(`${this.base}/expenses`, payload);
   }
 
+  importExpenses(
+    file: File,
+    options?: { status?: ExpenseStatus; dateFormat?: string; mode?: 'upsert' | 'insert_only' }
+  ) {
+    let params = new HttpParams();
+    if (options?.status) {
+      params = params.set('status', options.status);
+    }
+    if (options?.dateFormat) {
+      params = params.set('dateFormat', options.dateFormat);
+    }
+    if (options?.mode) {
+      params = params.set('mode', options.mode);
+    }
+
+    return this.http.post<ImportSummary>(`${this.base}/expenses/import-bin`, file, {
+      params,
+      headers: { 'X-Filename': file.name || 'expenses-import' },
+    });
+  }
+
   approveExpense(id: number, approverId: number) {
     const params = new HttpParams().set('approverId', approverId);
     return this.http.put<FinanceExpense>(`${this.base}/expenses/${id}/approve`, null, { params });
@@ -116,6 +156,10 @@ export class FinanceService {
       params = params.set('status', status);
     }
     return this.http.get<FinanceInvoice[]>(`${this.base}/invoices`, { params });
+  }
+
+  getInvoice(id: number) {
+    return this.http.get<FinanceInvoice>(`${this.base}/invoices/${id}`);
   }
 
   createInvoice(payload: InvoiceRequest) {
@@ -140,8 +184,16 @@ export class FinanceService {
     return this.http.post<void>(`${this.base}/invoices/${id}/pdf`, formData);
   }
 
+  downloadInvoicePdf(id: number) {
+    return this.http.get(`${this.base}/invoices/${id}/pdf`, { responseType: 'blob' });
+  }
+
   getPayrollOverview(period: string) {
     const params = new HttpParams().set('period', period);
     return this.http.get<PayrollOverviewRow[]>(`${this.base}/payroll/overview`, { params });
+  }
+
+  calculatePayroll(payload: PayrollCalculationRequest) {
+    return this.http.post<PayrollRecord>(`${this.base}/payroll`, payload);
   }
 }
