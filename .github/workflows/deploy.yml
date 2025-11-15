@@ -45,8 +45,8 @@ jobs:
         MAP[report-service]="app9_repo"
 
         # Determine changed files safely
-        if [ "${GITHUB_EVENT_BEFORE}" = "0000000000000000000000000000000000000000" ]; then
-          echo "⚪ First commit detected or new branch, assuming all Dockerfiles may have changed"
+        if [ -z "${GITHUB_EVENT_BEFORE}" ] || [ "${GITHUB_EVENT_BEFORE}" = "0000000000000000000000000000000000000000" ]; then
+          echo "⚪ First commit detected or new branch, building all Dockerfiles"
           CHANGED_FILES=$(git ls-files)
         else
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
