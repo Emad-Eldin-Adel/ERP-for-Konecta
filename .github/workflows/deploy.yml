@@ -33,9 +33,8 @@ jobs:
 
     - name: Build & Push Docker Images (if Dockerfile changed)
       run: |
+        # Map microservices to ECR repos
         declare -A MAP
-
-        # Microservice-to-repo mapping
         MAP[api-geteway]="app2_repo"
         MAP[auth-service]="app3_repo"
         MAP[config]="app4_repo"
@@ -45,15 +44,21 @@ jobs:
         MAP[inventory-service]="app8_repo"
         MAP[report-service]="app9_repo"
 
-        # Get list of changed files in this push
-        CHANGED_FILES=$(git diff --name-only ${{ github.sha }} ${{ github.event.before }})
+        # Determine changed files safely
+        if [ "${GITHUB_EVENT_BEFORE}" = "0000000000000000000000000000000000000000" ]; then
+          echo "⚪ First commit detected or branch newly created, assuming all Dockerfiles changed"
+          CHANGED_FILES=$(git ls-files)
+        else
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        fi
 
+        # Loop over microservices
         for SERVICE in "${!MAP[@]}"; do
           DOCKERFILE_PATH="src/backend/$SERVICE/Dockerfile"
           REPO="${MAP[$SERVICE]}"
           IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO:latest"
 
-          # Check if Dockerfile changed
+          # Build & push only if Dockerfile changed
           if echo "$CHANGED_FILES" | grep -q "^$DOCKERFILE_PATH$"; then
             echo "🔵 Building service: $SERVICE → $IMAGE"
             docker build -t $IMAGE "./src/backend/$SERVICE"
