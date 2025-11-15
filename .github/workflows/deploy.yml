@@ -51,7 +51,8 @@ jobs:
 
           echo "🔵 Building service: $SERVICE → $IMAGE"
 
-          docker build -t $IMAGE "./src/$SERVICE"
+          # Updated build context path
+          docker build -t $IMAGE "./src/backend/$SERVICE"
 
           echo "🚀 Pushing $SERVICE to $REPO"
           docker push $IMAGE
