@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HrEmployee, HrEmployeeRequest, HrEmployeeService } from '../../../core/services/hr-employee.service';
+import { HrDepartment, HrDepartmentService } from '../../../core/services/hr-department.service';
 
 @Component({
   selector: 'app-hr-employees',
@@ -11,16 +12,20 @@ import { HrEmployee, HrEmployeeRequest, HrEmployeeService } from '../../../core/
 })
 export class HrEmployeeDashboardComponent implements OnInit {
   private service = inject(HrEmployeeService);
+  private deptService = inject(HrDepartmentService);
   private fb = inject(FormBuilder);
 
   employees = signal<HrEmployee[]>([]);
+  departments = signal<HrDepartment[]>([]);
   loading = signal(false);
+  departmentsLoading = signal(false);
   submitting = signal(false);
   showForm = signal(false);
   formTitle = signal('Add employee');
   search = signal('');
   error = signal('');
   formError = signal('');
+  departmentError = signal('');
   selectedEmployee = signal<HrEmployee | null>(null);
 
   form = this.fb.group({
@@ -69,6 +74,7 @@ export class HrEmployeeDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadEmployees();
+    this.loadDepartments();
   }
 
   loadEmployees() {
@@ -82,6 +88,18 @@ export class HrEmployeeDashboardComponent implements OnInit {
         this.error.set(err?.error?.message || 'Failed to load employees');
       },
       complete: () => this.loading.set(false),
+    });
+  }
+
+  loadDepartments() {
+    this.departmentsLoading.set(true);
+    this.deptService.list().subscribe({
+      next: (res) => {
+        this.departments.set(res);
+        this.departmentError.set('');
+      },
+      error: (err) => this.departmentError.set(err?.error?.message || 'Failed to load departments'),
+      complete: () => this.departmentsLoading.set(false),
     });
   }
 
@@ -174,5 +192,13 @@ export class HrEmployeeDashboardComponent implements OnInit {
       departmentId:
         value.departmentId !== undefined && value.departmentId !== null ? Number(value.departmentId) : null,
     };
+  }
+
+  departmentLabel(id: number | null | undefined) {
+    if (id === null || id === undefined) {
+      return '';
+    }
+    const dept = this.departments().find((item) => item.id === Number(id));
+    return dept ? `${dept.name} (#${dept.id})` : `ID ${id}`;
   }
 }

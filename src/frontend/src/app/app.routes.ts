@@ -20,6 +20,7 @@ import { FinanceOverviewComponent } from './pages/finance/overview/finance-overv
 import { FinanceExpensesComponent } from './pages/finance/expenses/finance-expenses.component';
 import { FinanceInvoicesComponent } from './pages/finance/invoices/finance-invoices.component';
 import { FinancePayrollComponent } from './pages/finance/payroll/finance-payroll.component';
+import { FinanceBudgetingComponent } from './pages/finance/budgeting/finance-budgeting.component';
 import { EmployeeSelfServiceComponent } from './pages/employee/self-service/employee-self-service.component';
 
 export const routes: Routes = [
@@ -54,6 +55,7 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'overview', pathMatch: 'full' },
           { path: 'overview', component: FinanceOverviewComponent },
+          { path: 'budgeting', component: FinanceBudgetingComponent },
           { path: 'expenses', component: FinanceExpensesComponent },
           { path: 'invoices', component: FinanceInvoicesComponent },
           { path: 'payroll', component: FinancePayrollComponent },

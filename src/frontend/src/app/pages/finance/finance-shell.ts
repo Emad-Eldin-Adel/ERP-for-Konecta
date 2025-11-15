@@ -4,6 +4,7 @@ import { NgFor } from '@angular/common';
 
 const NAV_ITEMS = [
   { label: 'Overview', path: '/finance/overview', icon: 'monitoring' },
+  { label: 'Budgeting', path: '/finance/budgeting', icon: 'account_tree' },
   { label: 'Expenses', path: '/finance/expenses', icon: 'receipt' },
   { label: 'Invoices', path: '/finance/invoices', icon: 'contract_edit' },
   { label: 'Payroll', path: '/finance/payroll', icon: 'payments' },

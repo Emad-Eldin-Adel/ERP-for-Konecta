@@ -158,8 +158,26 @@
           <input type="text" formControlName="position" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
         </div>
         <div>
-          <label class="text-sm font-medium text-slate-700">Department ID</label>
-          <input type="number" formControlName="departmentId" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" placeholder="Optional" />
+          <label class="text-sm font-medium text-slate-700">Department</label>
+          <input
+            type="number"
+            formControlName="departmentId"
+            list="employee-department-options"
+            class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+            placeholder="Search or type ID"
+            [attr.disabled]="departmentsLoading() ? true : null"
+          />
+          <datalist id="employee-department-options">
+            <option
+              *ngFor="let dept of departments()"
+              [value]="dept.id"
+              [label]="dept.name + ' (#' + dept.id + ')'"
+            ></option>
+          </datalist>
+          <p class="mt-1 text-xs text-slate-500" *ngIf="form.controls.departmentId.value">
+            Selected: {{ departmentLabel(form.controls.departmentId.value) }}
+          </p>
+          <p class="mt-1 text-xs text-rose-500" *ngIf="departmentError()">{{ departmentError() }}</p>
         </div>
         <div>
           <label class="text-sm font-medium text-slate-700">Hire date</label>

@@ -94,6 +94,7 @@ builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IExpenseImportService, ExpenseImportService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IPayrollService, PayrollService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IHrClient, HrHttpClient>();
 
 var app = builder.Build();
@@ -101,7 +102,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<FinanceDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
+    await dbContext.Database.MigrateAsync();
 }
 
 if (app.Environment.IsDevelopment())

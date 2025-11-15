@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "E:\\konecta_GP\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj": {}
+    "D:\\projects\\konecta\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj": {}
   },
   "projects": {
-    "E:\\konecta_GP\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj": {
+    "D:\\projects\\konecta\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\konecta_GP\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj",
+        "projectUniqueName": "D:\\projects\\konecta\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj",
         "projectName": "finance-service",
-        "projectPath": "E:\\konecta_GP\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj",
-        "packagesPath": "C:\\Users\\CompuMarts\\.nuget\\packages\\",
-        "outputPath": "E:\\konecta_GP\\ERP-for-Konecta\\src\\backend\\finance-service\\obj\\",
+        "projectPath": "D:\\projects\\konecta\\ERP-for-Konecta\\src\\backend\\finance-service\\finance-service.csproj",
+        "packagesPath": "C:\\Users\\Abdullah\\.nuget\\packages\\",
+        "outputPath": "D:\\projects\\konecta\\ERP-for-Konecta\\src\\backend\\finance-service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\CompuMarts\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Abdullah\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -110,7 +108,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

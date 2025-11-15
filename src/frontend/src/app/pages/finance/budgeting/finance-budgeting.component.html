@@ -1,0 +1,475 @@
+<section class="space-y-6">
+  <div *ngIf="error()" class="rounded-2xl border border-rose-100 bg-rose-50/80 px-4 py-3 text-sm text-rose-600">
+    {{ error() }}
+  </div>
+  <div *ngIf="loading()" class="rounded-2xl border border-slate-200 bg-white/60 px-4 py-3 text-sm text-slate-500">
+    Loading budgeting data...
+  </div>
+
+  <header class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-500">Budgeting</p>
+        <h2 class="mt-2 text-2xl font-semibold text-slate-900">Plan, lock, and monitor budgets</h2>
+        <p class="text-sm text-slate-500">
+          Align annual targets with departmental proposals and keep actual spending connected to forecasts.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700"
+        (click)="openCycleForm(selectedBudget() ?? undefined)"
+      >
+        <span class="material-symbols-outlined text-base">add</span>
+        {{ selectedBudget() ? 'Edit current cycle' : 'New budget cycle' }}
+      </button>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+        <p class="text-xs font-semibold uppercase text-slate-500">Annual Target</p>
+        <p class="mt-1 text-2xl font-bold text-slate-900">
+          {{
+            (selectedBudget()?.annualTarget ?? selectedBudget()?.approvedAmount ?? 0)
+              | currency : 'USD' : 'symbol' : '1.0-0'
+          }}
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+        <p class="text-xs font-semibold uppercase text-slate-500">YTD Actuals</p>
+        <p class="mt-1 text-2xl font-bold text-slate-900">
+          {{ (selectedBudget()?.ytdActuals ?? 0) | currency : 'USD' : 'symbol' : '1.0-0' }}
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+        <p class="text-xs font-semibold uppercase text-slate-500">Forecast variance</p>
+        <p
+          class="mt-1 text-2xl font-bold"
+          [class.text-emerald-600]="summary().variance <= 0"
+          [class.text-amber-600]="summary().variance > 0"
+        >
+          {{ summary().variance | number : '1.0-0' }}
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3">
+        <p class="text-xs font-semibold uppercase text-slate-500">Workflow complete</p>
+        <div class="mt-1 flex items-baseline gap-2">
+          <p class="text-2xl font-bold text-slate-900">{{ summary().completion }}%</p>
+          <p class="text-xs text-slate-500">of steps</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-[320px_1fr] xl:grid-cols-[360px_1fr]">
+    <div class="space-y-4">
+      <article class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900">Budget cycles</h3>
+            <p class="text-sm text-slate-500">Annual targets & approval states.</p>
+          </div>
+          <button
+            type="button"
+            class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:border-primary-200 hover:text-primary-600"
+            (click)="openCycleForm()"
+          >
+            New cycle
+          </button>
+        </div>
+        <p *ngIf="!budgets().length && !loading()" class="mt-4 text-sm text-slate-500">
+          No cycles yet. Create the first annual plan to get started.
+        </p>
+        <ul class="mt-4 space-y-3">
+          <li
+            *ngFor="let budget of budgets()"
+            (click)="selectBudget(budget.id)"
+            class="cursor-pointer rounded-2xl border px-4 py-3 transition"
+            [class.border-primary-200]="selectedBudgetId() === budget.id"
+            [class.bg-primary-50]="selectedBudgetId() === budget.id"
+            [class.border-slate-200]="selectedBudgetId() !== budget.id"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500">Fiscal year</p>
+                <p class="text-xl font-semibold text-slate-900">{{ budget.fiscalYear }}</p>
+                <p class="text-xs text-slate-500">Owner • {{ budget.owner || 'Unassigned' }}</p>
+              </div>
+              <span
+                class="rounded-full border px-3 py-1 text-xs font-semibold"
+                [class.border-emerald-200]="!budget.isLocked"
+                [class.text-emerald-600]="!budget.isLocked"
+                [class.border-slate-200]="budget.isLocked"
+                [class.text-slate-600]="budget.isLocked"
+              >
+                {{ budget.isLocked ? 'Locked' : 'Planning' }}
+              </span>
+            </div>
+            <div class="mt-3 h-2 w-full rounded-full bg-slate-100">
+              <div
+                class="h-2 rounded-full bg-primary-500 transition-[width]"
+                [style.width.%]="stageCompletion(budget)"
+              ></div>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>{{ stageCompletion(budget) }}% of stages</span>
+              <span>Updated {{ budget.updatedAt | date : 'MMM d' }}</span>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <article
+        *ngIf="showCycleForm()"
+        class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="text-lg font-semibold text-slate-900">
+            {{ editingCycleId() ? 'Update budget cycle' : 'Create budget cycle' }}
+          </h3>
+          <button type="button" class="text-sm text-slate-500 hover:text-slate-700" (click)="closeCycleForm()">
+            Close
+          </button>
+        </div>
+        <form class="mt-4 space-y-4" [formGroup]="cycleForm" (ngSubmit)="saveCycle()">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <label class="text-sm font-semibold text-slate-600">
+              Fiscal year
+              <input
+                type="number"
+                formControlName="fiscalYear"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Owner
+              <input
+                type="text"
+                formControlName="owner"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                placeholder="Finance lead"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Annual target
+              <input
+                type="number"
+                formControlName="annualTarget"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Approved amount
+              <input
+                type="number"
+                formControlName="approvedAmount"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              YTD actuals
+              <input
+                type="number"
+                formControlName="ytdActuals"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Latest forecast
+              <input
+                type="number"
+                formControlName="latestForecast"
+                class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+          </div>
+          <label class="block text-sm font-semibold text-slate-600">
+            Notes
+            <textarea
+              rows="3"
+              formControlName="notes"
+              class="mt-1 w-full rounded-2xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              placeholder="Summarize scope, target assumptions, or approvals."
+            ></textarea>
+          </label>
+          <label class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <input type="checkbox" formControlName="locked" class="rounded border-slate-300 text-primary-600 focus:ring-primary-200" />
+            Lock budget after upload
+          </label>
+          <div *ngIf="cycleError()" class="rounded-2xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+            {{ cycleError() }}
+          </div>
+          <button
+            type="submit"
+            class="w-full rounded-2xl bg-primary-600 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+            [disabled]="savingCycle()"
+          >
+            {{ savingCycle() ? 'Saving...' : (editingCycleId() ? 'Save changes' : 'Create cycle') }}
+          </button>
+        </form>
+      </article>
+    </div>
+
+    <div class="space-y-6">
+      <article class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">Workflow</p>
+            <h3 class="text-xl font-semibold text-slate-900">Budgeting module</h3>
+            <p class="text-sm text-slate-500">
+              Tracks the eight milestones from target definition through forecast realignment.
+            </p>
+          </div>
+          <div *ngIf="selectedBudget() as budget" class="text-right">
+            <p class="text-xs uppercase text-slate-500">FY {{ budget.fiscalYear }}</p>
+            <p class="text-xl font-semibold text-slate-900">{{ summary().completion }}% complete</p>
+          </div>
+        </div>
+
+        <ng-container *ngIf="selectedBudget() as budget; else selectBudgetPrompt">
+          <div class="mt-6 grid gap-4 lg:grid-cols-2">
+            <section
+              *ngFor="let stage of budget.stages"
+              class="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-slate-500">{{ stage.stage }}</p>
+                  <h4 class="text-lg font-semibold text-slate-900">{{ stage.label }}</h4>
+                </div>
+                <span
+                  class="rounded-full border px-3 py-1 text-xs font-semibold"
+                  [ngClass]="stateClasses(stage.state)"
+                >
+                  {{ stage.state.replace('_', ' ') }}
+                </span>
+              </div>
+              <dl class="mt-3 space-y-1 text-sm text-slate-500">
+                <div class="flex justify-between">
+                  <dt>Owner</dt>
+                  <dd class="font-medium text-slate-700">{{ stage.owner || '—' }}</dd>
+                </div>
+                <div class="flex justify-between text-xs text-slate-400">
+                  <span>Started {{ stage.startedAt ? (stage.startedAt | date : 'MMM d') : '—' }}</span>
+                  <span>Completed {{ stage.completedAt ? (stage.completedAt | date : 'MMM d') : '—' }}</span>
+                </div>
+                <div *ngIf="stage.notes" class="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                  {{ stage.notes }}
+                </div>
+              </dl>
+              <button
+                type="button"
+                class="mt-3 text-sm font-semibold text-primary-600 hover:text-primary-700"
+                (click)="editStage(stage)"
+              >
+                Update stage
+              </button>
+              <div
+                *ngIf="stageEditing() === stage.stage"
+                class="mt-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
+              >
+                <form [formGroup]="stageForm" (ngSubmit)="saveStage()" class="space-y-3">
+                  <label class="block text-sm font-semibold text-slate-600">
+                    Status
+                    <select
+                      formControlName="state"
+                      class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                    >
+                      <option *ngFor="let status of stageStates" [value]="status">{{ status.replace('_', ' ') }}</option>
+                    </select>
+                  </label>
+                  <label class="block text-sm font-semibold text-slate-600">
+                    Owner
+                    <input
+                      type="text"
+                      formControlName="owner"
+                      class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                    />
+                  </label>
+                  <label class="block text-sm font-semibold text-slate-600">
+                    Notes
+                    <textarea
+                      rows="2"
+                      formControlName="notes"
+                      class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                    ></textarea>
+                  </label>
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <label class="text-sm font-semibold text-slate-600">
+                      Started
+                      <input
+                        type="date"
+                        formControlName="startedAt"
+                        class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      />
+                    </label>
+                    <label class="text-sm font-semibold text-slate-600">
+                      Completed
+                      <input
+                        type="date"
+                        formControlName="completedAt"
+                        class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      />
+                    </label>
+                  </div>
+                  <div *ngIf="stageError()" class="rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+                    {{ stageError() }}
+                  </div>
+                  <div class="flex items-center justify-end gap-2">
+                    <button type="button" class="text-sm text-slate-500 hover:text-slate-700" (click)="cancelStageEdit()">
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+                      [disabled]="savingStage()"
+                    >
+                      {{ savingStage() ? 'Saving...' : 'Save stage' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+        </ng-container>
+        <ng-template #selectBudgetPrompt>
+          <p class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+            Select a budget cycle from the left to review its workflow.
+          </p>
+        </ng-template>
+      </article>
+
+      <article class="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Tracking</p>
+            <h3 class="text-xl font-semibold text-slate-900">Monthly budget vs actuals</h3>
+          </div>
+          <button
+            type="button"
+            class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:border-primary-200 hover:text-primary-600"
+            (click)="startSnapshot()"
+          >
+            Add month
+          </button>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="text-xs uppercase tracking-wide text-slate-500">
+              <tr>
+                <th class="px-3 py-2 text-left">Month</th>
+                <th class="px-3 py-2 text-right">Budget</th>
+                <th class="px-3 py-2 text-right">Actual</th>
+                <th class="px-3 py-2 text-right">Forecast</th>
+                <th class="px-3 py-2 text-right">Variance</th>
+                <th class="px-3 py-2 text-left">Notes</th>
+                <th class="px-3 py-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-600" *ngIf="selectedBudget() as budget; else emptySnapshots">
+              <tr *ngFor="let snapshot of budget.snapshots">
+                <td class="px-3 py-2 font-medium text-slate-800">{{ formatMonth(snapshot.month) }}</td>
+                <td class="px-3 py-2 text-right">{{ snapshot.budgetAmount ?? '—' }}</td>
+                <td class="px-3 py-2 text-right">{{ snapshot.actualAmount ?? '—' }}</td>
+                <td class="px-3 py-2 text-right">{{ snapshot.forecastAmount ?? '—' }}</td>
+                <td class="px-3 py-2 text-right" [class.text-emerald-600]="(snapshot.variance ?? 0) <= 0" [class.text-amber-600]="(snapshot.variance ?? 0) > 0">
+                  {{ snapshot.variance ?? '—' }}
+                </td>
+                <td class="px-3 py-2 text-slate-500">{{ snapshot.notes || '—' }}</td>
+                <td class="px-3 py-2 text-right">
+                  <button type="button" class="text-xs font-semibold text-primary-600 hover:text-primary-700" (click)="startSnapshot(snapshot)">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <ng-template #emptySnapshots>
+            <p class="px-3 py-6 text-center text-sm text-slate-500">Select a budget cycle to see monthly progress.</p>
+          </ng-template>
+        </div>
+
+        <form
+          *ngIf="selectedBudget()"
+          class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/80 p-4"
+          [formGroup]="snapshotForm"
+          (ngSubmit)="saveSnapshot()"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h4 class="text-base font-semibold text-slate-900">
+                {{ snapshotEditing() ? 'Update monthly snapshot' : 'Add monthly snapshot' }}
+              </h4>
+              <p class="text-xs text-slate-500">
+                {{ snapshotEditing() ? ('Editing ' + formatMonth(snapshotEditing())) : 'Capture budget, actual, and updated forecast.' }}
+              </p>
+            </div>
+            <button
+              *ngIf="snapshotEditing()"
+              type="button"
+              class="text-xs font-semibold text-slate-500 hover:text-slate-700"
+              (click)="cancelSnapshotEdit()"
+            >
+              Reset
+            </button>
+          </div>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <label class="text-sm font-semibold text-slate-600">
+              Month
+              <input
+                type="month"
+                formControlName="month"
+                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                [class.opacity-60]="snapshotEditing()"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Notes
+              <input
+                type="text"
+                formControlName="notes"
+                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                placeholder="Variance summary"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Budget amount
+              <input
+                type="number"
+                formControlName="budgetAmount"
+                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Actual amount
+              <input
+                type="number"
+                formControlName="actualAmount"
+                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+            <label class="text-sm font-semibold text-slate-600">
+              Forecast
+              <input
+                type="number"
+                formControlName="forecastAmount"
+                class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-900 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              />
+            </label>
+          </div>
+          <div *ngIf="snapshotError()" class="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+            {{ snapshotError() }}
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button
+              type="submit"
+              class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+              [disabled]="savingSnapshot()"
+            >
+              {{ savingSnapshot() ? 'Saving...' : 'Save snapshot' }}
+            </button>
+          </div>
+        </form>
+      </article>
+    </div>
+  </div>
+</section>

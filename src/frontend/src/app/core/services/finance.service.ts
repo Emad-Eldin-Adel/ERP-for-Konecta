@@ -4,6 +4,16 @@ import { environment } from '../../environments/environment';
 
 export type ExpenseStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID';
+export type BudgetStage =
+  | 'ANNUAL_TARGET'
+  | 'DEPARTMENT_PROPOSALS'
+  | 'CONSOLIDATION_REVIEW'
+  | 'HISTORICAL_COMPARISON'
+  | 'FINAL_APPROVAL'
+  | 'SYSTEM_UPLOAD_LOCK'
+  | 'MONTHLY_TRACKING'
+  | 'FORECAST_REALLOCATION';
+export type BudgetStageState = 'NOT_STARTED' | 'IN_PROGRESS' | 'WAITING' | 'COMPLETED';
 
 export interface FinanceExpense {
   id: number;
@@ -102,6 +112,74 @@ export interface ImportSummary {
   errors: string[];
 }
 
+export interface BudgetStageStatus {
+  id: number;
+  stage: BudgetStage;
+  label: string;
+  state: BudgetStageState;
+  owner: string | null;
+  notes: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface BudgetSnapshot {
+  id: number;
+  month: string;
+  budgetAmount: number | null;
+  actualAmount: number | null;
+  forecastAmount: number | null;
+  variance: number | null;
+  notes: string | null;
+}
+
+export interface FinanceBudgetCycle {
+  id: number;
+  fiscalYear: number;
+  annualTarget: number | null;
+  approvedAmount: number | null;
+  ytdActuals: number | null;
+  latestForecast: number | null;
+  isLocked: boolean;
+  lockedAt: string | null;
+  owner: string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  stages: BudgetStageStatus[];
+  snapshots: BudgetSnapshot[];
+}
+
+export interface BudgetCycleRequest {
+  fiscalYear: number;
+  annualTarget?: number | null;
+  approvedAmount?: number | null;
+  ytdActuals?: number | null;
+  latestForecast?: number | null;
+  owner?: string | null;
+  notes?: string | null;
+  locked?: boolean;
+  stages?: BudgetStageUpdateRequest[];
+  snapshots?: BudgetSnapshotUpdateRequest[];
+}
+
+export interface BudgetStageUpdateRequest {
+  stage: BudgetStage;
+  state: BudgetStageState;
+  owner?: string | null;
+  notes?: string | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+}
+
+export interface BudgetSnapshotUpdateRequest {
+  month: string;
+  budgetAmount?: number | null;
+  actualAmount?: number | null;
+  forecastAmount?: number | null;
+  notes?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FinanceService {
   private http = inject(HttpClient);
@@ -195,5 +273,29 @@ export class FinanceService {
 
   calculatePayroll(payload: PayrollCalculationRequest) {
     return this.http.post<PayrollRecord>(`${this.base}/payroll`, payload);
+  }
+
+  getBudgets() {
+    return this.http.get<FinanceBudgetCycle[]>(`${this.base}/budgets`);
+  }
+
+  getBudget(id: number) {
+    return this.http.get<FinanceBudgetCycle>(`${this.base}/budgets/${id}`);
+  }
+
+  createBudget(payload: BudgetCycleRequest) {
+    return this.http.post<FinanceBudgetCycle>(`${this.base}/budgets`, payload);
+  }
+
+  updateBudget(id: number, payload: BudgetCycleRequest) {
+    return this.http.put<FinanceBudgetCycle>(`${this.base}/budgets/${id}`, payload);
+  }
+
+  updateBudgetStage(id: number, payload: BudgetStageUpdateRequest) {
+    return this.http.put<BudgetStageStatus>(`${this.base}/budgets/${id}/stages`, payload);
+  }
+
+  upsertBudgetSnapshot(id: number, payload: BudgetSnapshotUpdateRequest) {
+    return this.http.put<BudgetSnapshot>(`${this.base}/budgets/${id}/snapshots`, payload);
   }
 }

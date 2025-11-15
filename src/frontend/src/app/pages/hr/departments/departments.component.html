@@ -15,6 +15,7 @@
     <table class="min-w-full divide-y divide-slate-200 text-sm">
       <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
         <tr>
+          <th class="px-4 py-3">ID</th>
           <th class="px-4 py-3">Name</th>
           <th class="px-4 py-3">Description</th>
           <th class="px-4 py-3">Actions</th>
@@ -22,6 +23,7 @@
       </thead>
       <tbody class="divide-y divide-slate-100">
         <tr *ngFor="let dept of departments()">
+          <td class="px-4 py-3 text-slate-500">#{{ dept.id }}</td>
           <td class="px-4 py-3 font-semibold text-slate-900">{{ dept.name }}</td>
           <td class="px-4 py-3 text-slate-600">{{ dept.description || '—' }}</td>
           <td class="px-4 py-3 space-x-2">
@@ -30,7 +32,7 @@
           </td>
         </tr>
         <tr *ngIf="departments().length === 0">
-          <td colspan="3" class="px-4 py-6 text-center text-sm text-slate-500">No departments yet.</td>
+          <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500">No departments yet.</td>
         </tr>
       </tbody>
     </table>

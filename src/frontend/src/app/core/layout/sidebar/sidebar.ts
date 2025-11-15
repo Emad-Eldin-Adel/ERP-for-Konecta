@@ -60,6 +60,7 @@ export class SidebarComponent implements OnInit {
       roles: ['ADMIN', 'FINANCE'],
       children: [
         { label: 'Overview', icon: 'monitoring', path: '/finance/overview' },
+        { label: 'Budgeting', icon: 'account_tree', path: '/finance/budgeting' },
         { label: 'Expenses', icon: 'receipt', path: '/finance/expenses' },
         { label: 'Invoices', icon: 'receipt_long', path: '/finance/invoices' },
         { label: 'Payroll', icon: 'payments', path: '/finance/payroll' },
