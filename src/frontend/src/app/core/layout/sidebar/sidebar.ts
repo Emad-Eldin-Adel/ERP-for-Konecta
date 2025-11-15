@@ -67,6 +67,17 @@ export class SidebarComponent implements OnInit {
       ],
     },
     {
+      label: 'Inventory',
+      icon: 'inventory_2',
+      roles: ['ADMIN', 'INVENTORY'],
+      children: [
+        { label: 'Items', icon: 'inventory_2', path: '/inventory/items' },
+        { label: 'Warehouses', icon: 'warehouse', path: '/inventory/warehouses' },
+        { label: 'Stock Levels', icon: 'stacked_bar_chart', path: '/inventory/levels' },
+        { label: 'Movements', icon: 'swap_vert', path: '/inventory/movements' },
+      ],
+    },
+    {
       label: 'Admin',
       icon: 'admin_panel_settings',
       roles: ['ADMIN'],

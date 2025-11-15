@@ -22,6 +22,11 @@ import { FinanceInvoicesComponent } from './pages/finance/invoices/finance-invoi
 import { FinancePayrollComponent } from './pages/finance/payroll/finance-payroll.component';
 import { FinanceBudgetingComponent } from './pages/finance/budgeting/finance-budgeting.component';
 import { EmployeeSelfServiceComponent } from './pages/employee/self-service/employee-self-service.component';
+import { InventoryShellComponent } from './pages/inventory/inventory-shell';
+import { InventoryItemsComponent } from './pages/inventory/items/inventory-items.component';
+import { InventoryWarehousesComponent } from './pages/inventory/warehouses/inventory-warehouses.component';
+import { InventoryLevelsComponent } from './pages/inventory/levels/inventory-levels.component';
+import { InventoryMovementsComponent } from './pages/inventory/movements/inventory-movements.component';
 
 export const routes: Routes = [
   {
@@ -59,6 +64,19 @@ export const routes: Routes = [
           { path: 'expenses', component: FinanceExpensesComponent },
           { path: 'invoices', component: FinanceInvoicesComponent },
           { path: 'payroll', component: FinancePayrollComponent },
+        ],
+      },
+      {
+        path: 'inventory',
+        component: InventoryShellComponent,
+        canActivate: [rolesGuard],
+        data: { roles: ['ADMIN', 'INVENTORY'] },
+        children: [
+          { path: '', redirectTo: 'items', pathMatch: 'full' },
+          { path: 'items', component: InventoryItemsComponent },
+          { path: 'warehouses', component: InventoryWarehousesComponent },
+          { path: 'levels', component: InventoryLevelsComponent },
+          { path: 'movements', component: InventoryMovementsComponent },
         ],
       },
       {

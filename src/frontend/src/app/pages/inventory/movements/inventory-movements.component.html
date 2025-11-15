@@ -1,0 +1,121 @@
+<section class="space-y-6">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-semibold text-slate-900">Stock movements</h2>
+      <p class="text-sm text-slate-500">Capture receipts, consumption, and transfers.</p>
+    </div>
+    <div class="text-sm text-slate-500">Page {{ page() + 1 }} / {{ totalPages() }}</div>
+  </header>
+
+  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+    {{ error() }}
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+    <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <h3 class="text-xl font-semibold text-slate-900">History</h3>
+        <div class="flex gap-2 text-sm">
+          <select #itemFilter class="rounded-xl border border-slate-200 px-3 py-2" (change)="setItemFilter(itemFilter.value)">
+            <option value="">All items</option>
+            <option *ngFor="let item of items()" [value]="item.id">{{ item.sku }}</option>
+          </select>
+          <select #warehouseFilter class="rounded-xl border border-slate-200 px-3 py-2" (change)="setWarehouseFilter(warehouseFilter.value)">
+            <option value="">All warehouses</option>
+            <option *ngFor="let wh of warehouses()" [value]="wh.id">{{ wh.code }}</option>
+          </select>
+          <button class="rounded-xl border border-slate-200 px-3 py-2 text-slate-600 hover:border-primary-200 hover:text-primary-600" type="button" (click)="applyFilter({})">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-3 py-2">Item</th>
+              <th class="px-3 py-2">Warehouse</th>
+              <th class="px-3 py-2">Type</th>
+              <th class="px-3 py-2 text-right">Quantity</th>
+              <th class="px-3 py-2">Reference</th>
+              <th class="px-3 py-2">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else loadingRows">
+            <tr *ngFor="let movement of movements(); trackBy: trackMovement">
+              <td class="px-3 py-3">{{ movement.itemId }}</td>
+              <td class="px-3 py-3">{{ movement.warehouseId }}</td>
+              <td class="px-3 py-3 font-semibold text-slate-900">{{ movement.movementType }}</td>
+              <td class="px-3 py-3 text-right">{{ movement.quantity | number: '1.2-2' }}</td>
+              <td class="px-3 py-3">{{ movement.reference || '—' }}</td>
+              <td class="px-3 py-3 text-xs text-slate-500">{{ movement.occurredAt | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #loadingRows>
+          <div class="py-6 text-center text-sm text-slate-500">Loading movements…</div>
+        </ng-template>
+      </div>
+
+      <div class="mt-4 flex items-center justify-between">
+        <button class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600" type="button" (click)="loadMovements(page() > 0 ? page() - 1 : 0)" [disabled]="page() === 0">
+          Previous
+        </button>
+        <button class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600" type="button" (click)="loadMovements(page() + 1)" [disabled]="page() + 1 >= totalPages()">
+          Next
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+        <h3 class="text-lg font-semibold text-slate-900">Register movement</h3>
+        <form class="mt-3 space-y-3" [formGroup]="movementForm" (ngSubmit)="submitMovement()">
+          <select class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="itemId">
+            <option value="">Select item</option>
+            <option *ngFor="let item of items()" [value]="item.id">{{ item.sku }} · {{ item.name }}</option>
+          </select>
+          <select class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="warehouseId">
+            <option value="">Select warehouse</option>
+            <option *ngFor="let wh of warehouses()" [value]="wh.id">{{ wh.code }}</option>
+          </select>
+          <select class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="movementType">
+            <option *ngFor="let type of movementTypes" [value]="type">{{ type }}</option>
+          </select>
+          <input type="number" min="0.01" step="0.01" class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="quantity" placeholder="Quantity" />
+          <input class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="reference" placeholder="Reference" />
+          <textarea class="w-full rounded-xl border border-slate-200 px-3 py-2" rows="2" formControlName="reason" placeholder="Notes"></textarea>
+          <button type="submit" class="w-full rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500">
+            Save movement
+          </button>
+        </form>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+        <h3 class="text-lg font-semibold text-slate-900">Transfer stock</h3>
+        <form class="mt-3 space-y-3" [formGroup]="transferForm" (ngSubmit)="submitTransfer()">
+          <select class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="itemId">
+            <option value="">Select item</option>
+            <option *ngFor="let item of items()" [value]="item.id">{{ item.sku }} · {{ item.name }}</option>
+          </select>
+          <div class="grid gap-3 md:grid-cols-2">
+            <select class="rounded-xl border border-slate-200 px-3 py-2" formControlName="sourceWarehouseId">
+              <option value="">From warehouse</option>
+              <option *ngFor="let wh of warehouses()" [value]="wh.id">{{ wh.code }}</option>
+            </select>
+            <select class="rounded-xl border border-slate-200 px-3 py-2" formControlName="targetWarehouseId">
+              <option value="">To warehouse</option>
+              <option *ngFor="let wh of warehouses()" [value]="wh.id">{{ wh.code }}</option>
+            </select>
+          </div>
+          <input type="number" min="0.01" step="0.01" class="w-full rounded-xl border border-slate-200 px-3 py-2" formControlName="quantity" placeholder="Quantity" />
+          <textarea class="w-full rounded-xl border border-slate-200 px-3 py-2" rows="2" formControlName="reason" placeholder="Reason"></textarea>
+          <button type="submit" class="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+            Create transfer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

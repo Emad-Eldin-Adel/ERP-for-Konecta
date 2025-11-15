@@ -14,12 +14,12 @@
     <div class="rounded-2xl border border-primary-100 bg-primary-50/60 p-4 shadow-sm" *ngIf="summary as s">
       <p class="text-xs font-semibold uppercase tracking-wide text-primary-600">Total Members</p>
       <p class="mt-2 text-3xl font-bold text-primary-900">{{ s.total }}</p>
-      <p class="text-xs text-primary-700">Active {{ s.active }} • Inactive {{ s.inactive }}</p>
+      <p class="text-xs text-primary-700">Active {{ s.active }} &middot; Inactive {{ s.inactive }}</p>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" *ngIf="summary as s">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Administrators</p>
       <p class="mt-2 text-3xl font-bold text-slate-900">{{ s.admins }}</p>
-      <p class="text-xs text-slate-500">HR {{ s.hr }} • Finance {{ s.finance }}</p>
+      <p class="text-xs text-slate-500">HR {{ s.hr }} &middot; Finance {{ s.finance }} &middot; Inventory {{ s.inventory }}</p>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" *ngIf="summary as s">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Employees</p>

@@ -1,0 +1,71 @@
+<section class="space-y-6">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-semibold text-slate-900">Stock visibility</h2>
+      <p class="text-sm text-slate-500">Quickly inspect availability by item or by warehouse.</p>
+    </div>
+  </header>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="text-sm font-semibold text-slate-600">
+      View by item
+      <select class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" [ngModel]="selectedItem()" (ngModelChange)="selectedItem.set($event); loadByItem($event)">
+        <option value="">Select item…</option>
+        <option *ngFor="let item of items()" [value]="item.id">{{ item.sku }} · {{ item.name }}</option>
+      </select>
+    </label>
+    <label class="text-sm font-semibold text-slate-600">
+      View by warehouse
+      <select class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" [ngModel]="selectedWarehouse()" (ngModelChange)="selectedWarehouse.set($event); loadByWarehouse($event)">
+        <option value="">Select warehouse…</option>
+        <option *ngFor="let wh of warehouses()" [value]="wh.id">{{ wh.code }} · {{ wh.name }}</option>
+      </select>
+    </label>
+  </div>
+
+  <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+    {{ error() }}
+  </div>
+
+  <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-xl font-semibold text-slate-900">Current stock</h3>
+        <p class="text-sm text-slate-500">{{ levels().length }} records · {{ totalOnHand() | number:'1.0-0' }} units on hand</p>
+      </div>
+      <div class="text-sm text-slate-500" *ngIf="loading()">Refreshing…</div>
+    </div>
+
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+          <tr>
+            <th class="px-3 py-2">SKU</th>
+            <th class="px-3 py-2">Warehouse</th>
+            <th class="px-3 py-2 text-right">On hand</th>
+            <th class="px-3 py-2 text-right">Reserved</th>
+            <th class="px-3 py-2 text-right">Available</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100" *ngIf="!loading(); else busy">
+          <tr *ngFor="let level of levels()">
+            <td class="px-3 py-3">
+              <p class="font-semibold text-slate-900">{{ level.itemSku }}</p>
+              <p class="text-xs text-slate-500">{{ level.itemName }}</p>
+            </td>
+            <td class="px-3 py-3">
+              <p class="font-semibold text-slate-900">{{ level.warehouseCode }}</p>
+              <p class="text-xs text-slate-500">{{ level.warehouseId }}</p>
+            </td>
+            <td class="px-3 py-3 text-right">{{ level.quantityOnHand | number: '1.2-2' }}</td>
+            <td class="px-3 py-3 text-right">{{ level.reservedQuantity | number: '1.2-2' }}</td>
+            <td class="px-3 py-3 text-right font-semibold text-slate-900">{{ level.availableQuantity | number: '1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #busy>
+        <div class="py-6 text-center text-sm text-slate-500">Loading stock levels…</div>
+      </ng-template>
+    </div>
+  </div>
+</section>

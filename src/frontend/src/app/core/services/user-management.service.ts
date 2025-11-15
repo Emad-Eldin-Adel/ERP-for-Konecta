@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
-export type UserRole = 'ADMIN' | 'HR' | 'FINANCE' | 'EMPLOYEE';
+export type UserRole = 'ADMIN' | 'HR' | 'FINANCE' | 'INVENTORY' | 'EMPLOYEE';
 export type UserStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface UserResponse {
@@ -22,6 +22,7 @@ export interface UserSummary {
   admins: number;
   hr: number;
   finance: number;
+  inventory: number;
   employees: number;
 }
 

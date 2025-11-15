@@ -34,7 +34,7 @@ export class AdminDashboardComponent implements OnInit {
   inviteError = signal('');
   userError = signal('');
 
-  readonly roles: UserRole[] = ['ADMIN', 'HR', 'FINANCE', 'EMPLOYEE'];
+  readonly roles: UserRole[] = ['ADMIN', 'HR', 'FINANCE', 'INVENTORY', 'EMPLOYEE'];
   readonly statuses: UserStatus[] = ['ACTIVE', 'INACTIVE'];
   currentUserRole: UserRole | null = null;
 
