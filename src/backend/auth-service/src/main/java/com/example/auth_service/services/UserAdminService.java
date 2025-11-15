@@ -102,9 +102,10 @@ public class UserAdminService {
         long admins = userRepository.countByRole(Role.ADMIN);
         long hr = userRepository.countByRole(Role.HR);
         long finance = userRepository.countByRole(Role.FINANCE);
+        long inventory = userRepository.countByRole(Role.INVENTORY);
         long employees = userRepository.countByRole(Role.EMPLOYEE);
 
-        return new UserSummaryResponse(total, active, inactive, admins, hr, finance, employees);
+        return new UserSummaryResponse(total, active, inactive, admins, hr, finance, inventory, employees);
     }
 
     private UserResponse mapToResponse(User user) {

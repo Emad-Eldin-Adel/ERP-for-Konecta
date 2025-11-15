@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/warehouses")
+@RequestMapping("/api/inventory/warehouses")
 @Validated
 public class WarehouseController {
 
