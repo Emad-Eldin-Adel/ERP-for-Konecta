@@ -31,7 +31,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build & Push Docker Images
+    - name: Build & Push Docker Images (if Dockerfile changed)
       run: |
         declare -A MAP
 
@@ -45,15 +45,21 @@ jobs:
         MAP[inventory-service]="app8_repo"
         MAP[report-service]="app9_repo"
 
+        # Get list of changed files in this push
+        CHANGED_FILES=$(git diff --name-only ${{ github.sha }} ${{ github.event.before }})
+
         for SERVICE in "${!MAP[@]}"; do
+          DOCKERFILE_PATH="src/backend/$SERVICE/Dockerfile"
           REPO="${MAP[$SERVICE]}"
           IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO:latest"
 
-          echo "🔵 Building service: $SERVICE → $IMAGE"
-
-          # Updated build context path
-          docker build -t $IMAGE "./src/backend/$SERVICE"
-
-          echo "🚀 Pushing $SERVICE to $REPO"
-          docker push $IMAGE
+          # Check if Dockerfile changed
+          if echo "$CHANGED_FILES" | grep -q "^$DOCKERFILE_PATH$"; then
+            echo "🔵 Building service: $SERVICE → $IMAGE"
+            docker build -t $IMAGE "./src/backend/$SERVICE"
+            echo "🚀 Pushing $SERVICE to $REPO"
+            docker push $IMAGE
+          else
+            echo "⚪ Skipping $SERVICE (Dockerfile not changed)"
+          fi
         done
