@@ -209,26 +209,6 @@ jobs:
           echo "✅ Angular frontend built successfully"
 
       # ------------------------------
-      # ☕ Backend - Java (Spring Boot)
-      # ------------------------------
-      - name: Set up Java Environment
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: ${{ env.JAVA_VERSION }}
-
-      - name: Build Spring Boot Services
-        working-directory: ./backend/java
-        run: |
-          echo "🏗️ Building Java Spring Boot services..."
-          if [ -f "mvnw" ]; then
-            ./mvnw clean package -DskipTests
-          else
-            mvn clean package -DskipTests
-          fi
-          echo "✅ Java Spring Boot services built"
-
-      # ------------------------------
       # 🧱 Backend - .NET (ASP.NET Core)
       # ------------------------------
       - name: Set up .NET SDK
@@ -237,14 +217,14 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore .NET Dependencies
-        working-directory: ./backend/dotnet
+        working-directory: src/backend
         run: |
           echo "📦 Restoring .NET dependencies..."
           dotnet restore
           echo "✅ .NET dependencies restored"
 
       - name: Build .NET Services
-        working-directory: ./backend/dotnet
+        working-directory: src/backend
         run: |
           echo "🏗️ Building .NET services..."
           dotnet build --no-restore -c Release
