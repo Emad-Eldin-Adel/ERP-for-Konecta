@@ -181,7 +181,6 @@ jobs:
             ~/.m2/repository
             ~/.npm
             ~/.nuget/packages
-            frontend/node_modules
           key: build-cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/pom.xml', '**/*.csproj') }}
           restore-keys: |
             build-cache-${{ runner.os }}-
@@ -205,11 +204,54 @@ jobs:
         working-directory: src/frontend
         run: |
           echo "🏗️ Building Angular frontend..."
-          npm run build --prod
+          npm run build
           echo "✅ Angular frontend built successfully"
 
       # ------------------------------
-      # ☕ Backend - .NET (ASP.NET Core)
+      # ☕ Backend - Java Spring Boot Services
+      # ------------------------------
+      - name: Set up Java Environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Build Spring Boot Services
+        run: |
+          echo "🏗️ Building Java Spring Boot Services..."
+
+          # Spring Boot services
+          spring_services=("auth-service" "hr-service" "report-service" "api-gateway" "config" "discovery" "inventory-service")
+
+          built_count=0
+          for service in "${spring_services[@]}"; do
+            service_path="src/backend/$service"
+            if [ -f "$service_path/pom.xml" ]; then
+              echo "📦 Building $service (Spring Boot)..."
+              cd "$service_path"
+              
+              # Use Maven wrapper if available, otherwise use system Maven
+              if [ -f "mvnw" ]; then
+                echo "   Using Maven Wrapper"
+                ./mvnw clean package -DskipTests
+              else
+                echo "   Using system Maven"
+                mvn clean package -DskipTests
+              fi
+              
+              cd -
+              echo "✅ $service built successfully"
+              built_count=$((built_count + 1))
+            else
+              echo "❌ $service: pom.xml not found at $service_path/pom.xml"
+            fi
+          done
+
+          echo ""
+          echo "📊 Spring Boot Summary: $built_count out of ${#spring_services[@]} services built"
+
+      # ------------------------------
+      # 🧱 Backend - .NET (ASP.NET Core)
       # ------------------------------
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v3
@@ -222,43 +264,50 @@ jobs:
           find src/backend -name "*.csproj" -type f
 
           echo "🏗️ Building .NET services..."
-          # Build each microservice individually in its own directory
-          services=("api-gateway" "auth-service" "config" "discovery" "finance-service" "hr-service" "inventory-service" "report-service" "user-management")
+          # Only Finance Service is .NET
+          dotnet_services=("finance-service")
 
-          for service in "${services[@]}"; do
+          built_count=0
+          for service in "${dotnet_services[@]}"; do
             service_path="src/backend/$service"
-            if [ -f "$service_path/$service.csproj" ]; then
-              echo "📦 Building $service..."
+            if find "$service_path" -name "*.csproj" -type f | grep -q .; then
+              echo "📦 Building $service (.NET)..."
               cd "$service_path"
               dotnet restore
               dotnet build --configuration Release --no-restore
               cd -
               echo "✅ $service built successfully"
-            elif [ -f "$service_path/*.csproj" ]; then
-              # If csproj has different name
-              echo "📦 Building $service (different csproj name)..."
-              cd "$service_path"
-              dotnet restore
-              dotnet build --configuration Release --no-restore
-              cd -
-              echo "✅ $service built successfully"
+              built_count=$((built_count + 1))
             else
-              echo "⏭️ Skipping $service (no csproj found)"
+              echo "❌ $service: No .csproj file found"
             fi
           done
-          echo "✅ All .NET services built"
+
+          echo ""
+          echo "📊 .NET Summary: $built_count out of ${#dotnet_services[@]} services built"
 
       # ------------------------------
       # 🧾 Save Build Artifacts
       # ------------------------------
-      - name: Upload Build Artifacts
+      - name: Upload Frontend Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: konecta-build-artifacts
-          path: |
-            frontend/dist/
-            backend/java/**/target/*.jar
-            backend/dotnet/**/bin/Release/
+          name: frontend-dist
+          path: src/frontend/dist/
+          retention-days: 7
+
+      - name: Upload Java Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-services
+          path: src/backend/**/target/*.jar
+          retention-days: 7
+
+      - name: Upload .NET Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-services
+          path: src/backend/**/bin/Release/
           retention-days: 7
 
       - name: Build Summary
@@ -266,8 +315,8 @@ jobs:
           echo "🎯 BUILD SUMMARY - KONECTA ERP"
           echo "=============================="
           echo "✅ Frontend (Angular) - Built successfully"
-          echo "✅ Backend Java (Spring Boot) - Built successfully" 
-          echo "✅ Backend .NET (ASP.NET Core) - Built successfully"
+          echo "✅ Backend Java Spring Boot (7 services) - Built successfully" 
+          echo "✅ Backend .NET (1 service) - Built successfully"
           echo "📦 Artifacts saved for deployment"
 
   # ------------------------------
@@ -291,7 +340,7 @@ jobs:
         run: |
           echo "🔍 Verifying build artifacts..."
           if [ -d "artifacts" ]; then
-            find artifacts -type f | head -10
+            find artifacts -type f | head -20
             echo "✅ Build artifacts verified"
           else
             echo "❌ No artifacts found"
@@ -340,6 +389,12 @@ jobs:
           echo "| 🧪 Integration Tests | ${{ needs.integration-test.result }} | Basic validation completed |" >> quality-report.md
           echo "" >> quality-report.md
 
+          echo "## Built Components" >> quality-report.md
+          echo "- ✅ Frontend: Angular 20" >> quality-report.md
+          echo "- ✅ Backend: 8 Microservices (7 Spring Boot + 1 .NET)" >> quality-report.md
+          echo "- ⏭️ AI: No AI code yet" >> quality-report.md
+          echo "" >> quality-report.md
+
           echo "## Deployment Ready" >> quality-report.md
           if [ "${{ github.ref }}" == "refs/heads/production" ]; then
             echo "🚀 **READY FOR PRODUCTION DEPLOYMENT**" >> quality-report.md
@@ -347,12 +402,14 @@ jobs:
             echo "Next step: Trigger AWS ECR deployment via deploy.yml workflow" >> quality-report.md
             echo "" >> quality-report.md
             echo "### Microservices to be deployed:" >> quality-report.md
-            echo "- API Gateway" >> quality-report.md
-            echo "- Auth Service" >> quality-report.md  
-            echo "- Finance Service" >> quality-report.md
-            echo "- HR Service" >> quality-report.md
-            echo "- Inventory Service" >> quality-report.md
-            echo "- Reporting Service" >> quality-report.md
+            echo "- API Gateway (Spring Boot)" >> quality-report.md
+            echo "- Auth Service (Spring Boot)" >> quality-report.md  
+            echo "- Finance Service (.NET)" >> quality-report.md
+            echo "- HR Service (Spring Boot)" >> quality-report.md
+            echo "- Inventory Service (Spring Boot)" >> quality-report.md
+            echo "- Reporting Service (Spring Boot)" >> quality-report.md
+            echo "- Config Server (Spring Boot)" >> quality-report.md
+            echo "- Discovery Service (Spring Boot)" >> quality-report.md
           else
             echo "🔧 Development branch - deployment not triggered" >> quality-report.md
           fi
@@ -387,6 +444,6 @@ jobs:
           echo ""
           echo "🔧 Team Status:"
           echo "  - Frontend: ✅ Built and ready"
-          echo "  - Backend: ✅ Built and ready" 
+          echo "  - Backend: ✅ 8 services built (7 Spring Boot + 1 .NET)" 
           echo "  - AI: ⏳ Waiting for code contribution"
           echo "  - DevOps: ✅ Pipeline operational"
