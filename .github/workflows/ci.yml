@@ -195,7 +195,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Frontend Dependencies
-        working-directory: ./frontend
+        working-directory: src/frontend
         run: |
           echo "📦 Installing frontend dependencies..."
           npm ci
