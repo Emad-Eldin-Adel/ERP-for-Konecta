@@ -7,7 +7,7 @@ on:
     branches: ["production"]
 
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 20.19.0
   JAVA_VERSION: 17
   DOTNET_VERSION: 8.0.x
   PYTHON_VERSION: 3.10
@@ -187,7 +187,7 @@ jobs:
             build-cache-${{ runner.os }}-
 
       # ------------------------------
-      # 🌐 Frontend (Angular 18)
+      # 🌐 Frontend (Angular 20)
       # ------------------------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
