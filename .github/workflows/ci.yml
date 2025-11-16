@@ -230,14 +230,8 @@ jobs:
               echo "📦 Building $service (Spring Boot)..."
               cd "$service_path"
               
-              # Use Maven wrapper if available, otherwise use system Maven
-              if [ -f "mvnw" ]; then
-                echo "   Using Maven Wrapper"
-                ./mvnw clean package -DskipTests
-              else
-                echo "   Using system Maven"
-                mvn clean package -DskipTests
-              fi
+              # Always use system Maven to avoid permission issues
+              mvn clean package -DskipTests
               
               cd -
               echo "✅ $service built successfully"
@@ -249,7 +243,6 @@ jobs:
 
           echo ""
           echo "📊 Spring Boot Summary: $built_count out of ${#spring_services[@]} services built"
-
       # ------------------------------
       # 🧱 Backend - .NET (ASP.NET Core)
       # ------------------------------
