@@ -6,8 +6,11 @@
 
   <form class="grid gap-4 md:grid-cols-3" [formGroup]="form" (ngSubmit)="loadStatus()">
     <div>
-      <label class="text-sm font-medium text-slate-700">Employee ID</label>
-      <input type="number" formControlName="employeeId" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100" />
+      <app-employee-picker
+        formControlName="employeeId"
+        label="Employee"
+        hint="Search by name or email and we will fill the ID for you."
+        [required]="true"></app-employee-picker>
     </div>
     <div>
       <label class="text-sm font-medium text-slate-700">Last working day</label>

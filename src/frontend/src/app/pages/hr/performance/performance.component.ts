@@ -6,12 +6,13 @@ import {
   HrPerformanceRequest,
   HrPerformanceService,
 } from '../../../core/services/hr-performance.service';
+import { EmployeePickerComponent } from '../../../shared/employee-picker/employee-picker.component';
 
 @Component({
   selector: 'app-hr-performance',
   standalone: true,
   templateUrl: './performance.component.html',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, EmployeePickerComponent],
 })
 export class HrPerformanceComponent {
   private service = inject(HrPerformanceService);
