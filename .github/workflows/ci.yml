@@ -202,7 +202,7 @@ jobs:
           echo "✅ Frontend dependencies installed"
 
       - name: Build Angular Frontend
-        working-directory: ./frontend
+        working-directory: src/frontend
         run: |
           echo "🏗️ Building Angular frontend..."
           npm run build --prod
