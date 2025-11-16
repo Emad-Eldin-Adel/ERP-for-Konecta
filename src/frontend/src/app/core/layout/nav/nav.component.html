@@ -120,6 +120,18 @@
       <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Invoices</button>
     </div>
 
+    <!-- Chatbot CTA -->
+    <a
+      href="https://konecta-erp-chatbot-xbqmaly2xz8nfwe74kqc9r.streamlit.app/"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hidden sm:inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      [ngClass]="brandOn ? 'border-white/40 text-white hover:bg-white/10 focus-visible:outline-white/80' : 'border-primary-200 text-primary-600 hover:bg-primary-50 focus-visible:outline-primary-400'"
+    >
+      <span aria-hidden="true" class="text-xs font-bold uppercase tracking-widest">AI</span>
+      <span>Ask Konecta</span>
+    </a>
+
     <!-- Profile menu -->
     <div class="relative top-nav__profile-wrapper">
       <button *ngIf="role; else guestActions"
