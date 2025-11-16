@@ -1,0 +1,56 @@
+<div class="space-y-2">
+  <label class="text-sm font-medium text-slate-700">
+    {{ label }}
+    <span *ngIf="required" class="text-red-500">*</span>
+  </label>
+  <div class="flex gap-2">
+    <input
+      type="text"
+      class="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-primary-500 focus:ring-4 focus:ring-primary-100 disabled:bg-slate-50"
+      [attr.placeholder]="placeholder"
+      [value]="searchTerm()"
+      (input)="onInput($any($event.target).value)"
+      (focus)="openDropdown()"
+      (blur)="handleBlur()"
+      [disabled]="disabled()" />
+    <button
+      type="button"
+      class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+      *ngIf="selectedEmployee()"
+      (click)="clearSelection()"
+      [disabled]="disabled()">
+      Clear
+    </button>
+  </div>
+  <p class="text-xs text-slate-500" *ngIf="hint">{{ hint }}</p>
+  <p class="text-xs text-slate-600" *ngIf="selectedEmployee() as emp">
+    Selected: <span class="font-medium text-slate-900">{{ employeeSummary(emp) }}</span>
+  </p>
+
+  <div
+    class="w-full rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5"
+    *ngIf="dropdownVisible()">
+    <div *ngIf="loading()" class="px-4 py-3 text-sm text-slate-500">Loading employees…</div>
+    <div *ngIf="!loading() && loadError()" class="px-4 py-3 text-sm text-red-600">
+      {{ loadError() }}
+    </div>
+    <ng-container *ngIf="!loading() && !loadError()">
+      <button
+        type="button"
+        class="flex w-full flex-col gap-0.5 border-t border-slate-100 px-4 py-2 text-left first:border-t-0 hover:bg-primary-50"
+        *ngFor="let emp of suggestions()"
+        (mousedown)="$event.preventDefault()"
+        (click)="selectEmployee(emp)">
+        <span class="text-sm font-semibold text-slate-900">
+          {{ employeeName(emp) }}
+        </span>
+        <span class="text-xs text-slate-500">#{{ emp.id }} · {{ emp.email || '—' }}</span>
+      </button>
+      <div
+        class="border-t border-slate-100 px-4 py-3 text-sm text-slate-500"
+        *ngIf="suggestions().length === 0">
+        No matches. Try another name or email.
+      </div>
+    </ng-container>
+  </div>
+</div>

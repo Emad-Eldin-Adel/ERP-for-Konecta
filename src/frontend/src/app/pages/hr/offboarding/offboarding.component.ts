@@ -6,12 +6,13 @@ import {
   HrOffboardingService,
   HrOffboardingStatus,
 } from '../../../core/services/hr-offboarding.service';
+import { EmployeePickerComponent } from '../../../shared/employee-picker/employee-picker.component';
 
 @Component({
   selector: 'app-hr-offboarding',
   standalone: true,
   templateUrl: './offboarding.component.html',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, EmployeePickerComponent],
 })
 export class HrOffboardingComponent {
   private service = inject(HrOffboardingService);
