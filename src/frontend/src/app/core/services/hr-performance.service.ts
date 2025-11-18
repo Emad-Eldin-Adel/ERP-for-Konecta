@@ -26,6 +26,10 @@ export class HrPerformanceService {
     return this.http.get<HrPerformance[]>(`${this.base}/${employeeId}`);
   }
 
+  mine() {
+    return this.http.get<HrPerformance[]>(`${this.base}/me`);
+  }
+
   create(payload: HrPerformanceRequest) {
     return this.http.post<HrPerformance>(this.base, payload);
   }

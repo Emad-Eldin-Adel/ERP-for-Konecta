@@ -94,30 +94,29 @@
       <a routerLink="/" class="text-sm font-medium hover:underline underline-offset-4 decoration-2 mr-6" [ngClass]="brandOn ? 'text-white decoration-white' : 'text-slate-900 decoration-slate-900'">Home</a>
       <a [routerLink]="['/']" fragment="about" class="text-sm font-medium hover:underline underline-offset-4 decoration-2 mr-6" [ngClass]="brandOn ? 'text-white decoration-white' : 'text-slate-900 decoration-slate-900'">About us</a>
     </ng-container>
-    <!-- Employee primary nav buttons (placeholders) -->
+    <!-- Employee primary nav buttons -->
     <div *ngIf="role === 'EMPLOYEE'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Tasks</button>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</button>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Training</button>
+      <a routerLink="/workspace" fragment="workspace" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Workspace</a>
+      <a routerLink="/workspace" fragment="attendance" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Attendance</a>
+      <a routerLink="/workspace" fragment="time-off" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Time off</a>
+      <a routerLink="/workspace" fragment="performance" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Performance</a>
     </div>
-    <!-- Admin primary nav buttons (placeholders) -->
+    <!-- Admin primary nav buttons -->
     <div *ngIf="role === 'ADMIN'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
       <a routerLink="/admin" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Dashboard</a>
       <a routerLink="/hr/employees" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">People</a>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Roles</button>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Settings</button>
     </div>
-    <!-- HR primary nav buttons (placeholders) -->
-    <div *ngIf="role === 'HR'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+    <!-- HR primary nav buttons -->
+    <div *ngIf="isHrRoute && (role === 'HR' || role === 'ADMIN')" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
       <a routerLink="/hr/employees" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Employees</a>
       <a routerLink="/hr/attendance" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Attendance</a>
-      <a routerLink="/hr/leaves" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</a>
+      <a routerLink="/hr/leave" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Leave</a>
     </div>
-    <!-- Finance primary nav buttons (placeholders) -->
-    <div *ngIf="role === 'FINANCE'" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Budgets</button>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Transactions</button>
-      <button type="button" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Invoices</button>
+    <!-- Finance primary nav buttons -->
+    <div *ngIf="isFinanceRoute && (role === 'FINANCE' || role === 'ADMIN')" class="hidden md:flex items-center gap-6 mr-2 border-l border-white/30 pl-6">
+      <a routerLink="/finance/budgeting" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Budgets</a>
+      <a routerLink="/finance/expenses" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Transactions</a>
+      <a routerLink="/finance/invoices" class="text-white text-sm font-medium hover:text-white hover:underline underline-offset-4 decoration-2 decoration-white">Invoices</a>
     </div>
 
     <!-- Chatbot CTA -->

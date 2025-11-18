@@ -9,6 +9,7 @@ import com.example.hr_service.dtos.response.LeaveResponse;
 import com.example.hr_service.models.Employee;
 import com.example.hr_service.models.LeaveRequest;
 import com.example.hr_service.models.LeaveStatus;
+import com.example.hr_service.models.LeaveType;
 import com.example.hr_service.services.LeaveService;
 import com.example.hr_service.services.EmployeeService;
 import java.util.List;
@@ -35,11 +36,13 @@ public class LeaveController {
                     : (username != null ? username : "");
             e = employeeService.ensureByEmail(username, first, "", null, null, null, null, null);
         }
+        LeaveType requestedType = req.getLeaveType() != null ? req.getLeaveType() : LeaveType.VACATION;
         LeaveRequest r = LeaveRequest.builder()
                 .employee(e)
                 .startDate(req.getStartDate())
                 .endDate(req.getEndDate())
                 .reason(req.getReason())
+                .leaveType(requestedType)
                 .status(LeaveStatus.PENDING)
                 .build();
         return ResponseEntity.ok(toResponse(leaveService.create(r)));
@@ -120,6 +123,7 @@ public class LeaveController {
                 .endDate(r.getEndDate())
                 .reason(r.getReason())
                 .status(r.getStatus() != null ? r.getStatus().name() : null)
+                .leaveType(r.getLeaveType() != null ? r.getLeaveType().name() : null)
                 .build();
     }
 }

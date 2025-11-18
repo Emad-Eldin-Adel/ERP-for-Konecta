@@ -30,8 +30,9 @@ const NAV_ITEMS = [
           <a
             *ngFor="let item of nav"
             [routerLink]="item.path"
-            routerLinkActive="bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+            routerLinkActive="bg-primary-100 text-primary-700 shadow-lg shadow-primary-500/30 border border-primary-200"
             class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-primary-200 hover:text-primary-600"
+            [routerLinkActiveOptions]="{ exact: true }"
           >
             <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
             {{ item.label }}

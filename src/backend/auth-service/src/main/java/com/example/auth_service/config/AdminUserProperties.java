@@ -20,7 +20,7 @@ public class AdminUserProperties {
      */
     private String email = "admin@konecta.com";
 
-    private String password = "ChangeMe123!";
+    private String password = "Admin@211";
 
     public String getFullName() {
         return fullName;

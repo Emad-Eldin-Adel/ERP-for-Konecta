@@ -18,6 +18,8 @@ export class NavbarComponent {
 
   isHomeRoute = false;
   isAuthRoute = false;
+  isHrRoute = false;
+  isFinanceRoute = false;
   isProfileMenuOpen = false;
 
   initials = 'AA';
@@ -30,6 +32,7 @@ export class NavbarComponent {
   constructor() {
     // set initial flags
     this.setFlags(this.router.url);
+    this.applyUser(this.auth.currentUser);
     // update on navigation
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
@@ -41,8 +44,11 @@ export class NavbarComponent {
   }
 
   private setFlags(url: string) {
-    this.isHomeRoute = url === '/' || url === '';
-    this.isAuthRoute = url.startsWith('/auth/');
+    const normalized = this.normalizeUrl(url);
+    this.isHomeRoute = normalized === '/' || normalized === '';
+    this.isAuthRoute = normalized.startsWith('/auth/');
+    this.isHrRoute = normalized.startsWith('/hr');
+    this.isFinanceRoute = normalized.startsWith('/finance');
   }
 
   private applyUser(user: AuthUser | null) {
@@ -50,6 +56,22 @@ export class NavbarComponent {
     this.email = user?.email ?? '';
     this.initials = this.createInitials(user?.fullName || user?.email || '');
     this.brandOn = !!user;
+  }
+
+  private normalizeUrl(url: string) {
+    if (!url) {
+      return '/';
+    }
+    const questionIndex = url.indexOf('?');
+    const hashIndex = url.indexOf('#');
+    let end = url.length;
+    if (questionIndex !== -1) {
+      end = Math.min(end, questionIndex);
+    }
+    if (hashIndex !== -1) {
+      end = Math.min(end, hashIndex);
+    }
+    return url.slice(0, end) || '/';
   }
 
   private createInitials(value: string) {

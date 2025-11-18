@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.hr_service.models.LeaveRequest;
 import com.example.hr_service.models.Employee;
 import com.example.hr_service.models.LeaveStatus;
+import com.example.hr_service.models.LeaveType;
 import com.example.hr_service.repositories.LeaveRequestRepository;
 import com.example.hr_service.repositories.EmployeeRepository;
 import java.util.List;
@@ -17,6 +18,9 @@ public class LeaveService {
 
     public LeaveRequest create(LeaveRequest request) {
         request.setStatus(LeaveStatus.PENDING);
+        if (request.getLeaveType() == null) {
+            request.setLeaveType(LeaveType.VACATION);
+        }
         return leaveRepository.save(request);
     }
 

@@ -13,12 +13,14 @@ export interface HrLeave {
   endDate: string;
   reason: string;
   status: LeaveStatus;
+  leaveType?: string | null;
 }
 
 export interface LeaveRequestPayload {
   startDate: string;
   endDate: string;
   reason: string;
+  leaveType: string;
 }
 
 @Injectable({ providedIn: 'root' })

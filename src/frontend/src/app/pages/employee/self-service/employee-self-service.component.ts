@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HrAttendance, HrAttendanceService } from '../../../core/services/hr-attendance.service';
 import { HrLeave, HrLeaveService } from '../../../core/services/hr-leave.service';
+import { HrPerformance, HrPerformanceService } from '../../../core/services/hr-performance.service';
 
 @Component({
   selector: 'app-employee-self-service',
@@ -13,7 +14,17 @@ import { HrLeave, HrLeaveService } from '../../../core/services/hr-leave.service
 export class EmployeeSelfServiceComponent implements OnInit {
   private attendanceService = inject(HrAttendanceService);
   private leaveService = inject(HrLeaveService);
+  private performanceService = inject(HrPerformanceService);
   private fb = inject(FormBuilder);
+
+  readonly timeOffTypes = [
+    { value: 'VACATION', label: 'Vacation' },
+    { value: 'HOLIDAY', label: 'Holiday' },
+    { value: 'PERSONAL', label: 'Personal day' },
+    { value: 'SICK', label: 'Sick time' },
+    { value: 'UNPAID', label: 'Unpaid leave' },
+    { value: 'OTHER', label: 'Other' },
+  ];
 
   attendance = signal<HrAttendance[]>([]);
   attendanceLoading = signal(false);
@@ -27,15 +38,21 @@ export class EmployeeSelfServiceComponent implements OnInit {
   leaveMessage = signal('');
   leaveSubmitting = signal(false);
 
+  performance = signal<HrPerformance[]>([]);
+  performanceLoading = signal(false);
+  performanceError = signal('');
+
   leaveForm = this.fb.group({
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
+    leaveType: ['VACATION', Validators.required],
     reason: ['', [Validators.required, Validators.minLength(5)]],
   });
 
   ngOnInit(): void {
     this.refreshAttendance();
     this.refreshLeaves();
+    this.refreshPerformance();
   }
 
   refreshAttendance() {
@@ -62,6 +79,21 @@ export class EmployeeSelfServiceComponent implements OnInit {
     });
   }
 
+  refreshPerformance() {
+    this.performanceLoading.set(true);
+    this.performanceService.mine().subscribe({
+      next: (records) => {
+        const sorted = [...records].sort((a, b) =>
+          (b.reviewDate || '').localeCompare(a.reviewDate || '')
+        );
+        this.performance.set(sorted);
+        this.performanceError.set('');
+      },
+      error: (err) => this.performanceError.set(err?.error?.message || 'Unable to load performance reviews'),
+      complete: () => this.performanceLoading.set(false),
+    });
+  }
+
   get todayRecord() {
     const today = new Date().toISOString().slice(0, 10);
     return this.attendance().find((r) => r.date === today) ?? null;
@@ -75,6 +107,10 @@ export class EmployeeSelfServiceComponent implements OnInit {
   get canCheckOut() {
     const record = this.todayRecord;
     return !this.checkOutSubmitting() && !!record?.checkInAt && !record.checkOutAt;
+  }
+
+  get leaveTypeControl() {
+    return this.leaveForm.get('leaveType');
   }
 
   checkIn() {
@@ -109,15 +145,32 @@ export class EmployeeSelfServiceComponent implements OnInit {
     this.leaveSubmitting.set(true);
     this.leaveMessage.set('');
     this.leaveError.set('');
-    const payload = this.leaveForm.value as { startDate: string; endDate: string; reason: string };
+    const payload = this.leaveForm.value as {
+      startDate: string;
+      endDate: string;
+      reason: string;
+      leaveType: string;
+    };
     this.leaveService.request(payload).subscribe({
       next: () => {
         this.leaveMessage.set('Leave request submitted.');
-        this.leaveForm.reset();
+        this.leaveForm.reset({ leaveType: 'VACATION' });
         this.refreshLeaves();
       },
       error: (err) => this.leaveError.set(err?.error?.message || 'Failed to submit leave request'),
       complete: () => this.leaveSubmitting.set(false),
     });
+  }
+
+  leaveTypeLabel(type: string | null | undefined) {
+    if (!type) {
+      return 'Unspecified';
+    }
+    const option = this.timeOffTypes.find((opt) => opt.value === type);
+    if (option) {
+      return option.label;
+    }
+    const lower = type.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
   }
 }

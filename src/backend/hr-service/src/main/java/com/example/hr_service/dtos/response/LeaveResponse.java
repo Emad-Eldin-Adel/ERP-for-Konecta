@@ -19,4 +19,5 @@ public class LeaveResponse {
     private LocalDate endDate;
     private String reason;
     private String status;
+    private String leaveType;
 }

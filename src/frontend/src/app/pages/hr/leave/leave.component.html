@@ -1,8 +1,8 @@
-<section class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm space-y-4">
+﻿<section class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h2 class="text-xl font-semibold text-slate-900">Leave approvals</h2>
-      <p class="text-sm text-slate-500">Monitor employee time-off and keep compliance clean.</p>
+      <h2 class="text-xl font-semibold text-slate-900">Time-off approvals</h2>
+      <p class="text-sm text-slate-500">See exactly what kind of time away your employees are requesting.</p>
     </div>
     <div class="flex gap-2">
       <button *ngFor="let status of statuses"
@@ -23,6 +23,7 @@
         <tr>
           <th class="px-4 py-3">Employee</th>
           <th class="px-4 py-3">Dates</th>
+          <th class="px-4 py-3">Type</th>
           <th class="px-4 py-3">Reason</th>
           <th class="px-4 py-3">Status</th>
           <th class="px-4 py-3">Actions</th>
@@ -36,8 +37,8 @@
             </p>
             <p class="text-xs text-slate-500">{{ leave.employeeEmail || 'Email not provided' }}</p>
           </td>
-          <td class="px-4 py-3 text-slate-600">{{ leave.startDate }} → {{ leave.endDate }}</td>
-          <td class="px-4 py-3 text-slate-600">{{ leave.reason || '—' }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ leave.startDate }} - {{ leave.endDate }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ leave.reason || '--' }}</td>
           <td class="px-4 py-3">
             <span class="rounded-full px-3 py-1 text-xs font-semibold"
               [ngClass]="{
@@ -52,9 +53,10 @@
           </td>
         </tr>
         <tr *ngIf="filteredLeaves.length === 0">
-          <td colspan="5" class="px-4 py-6 text-center text-sm text-slate-500">{{ loading() ? 'Loading leave data…' : 'No leave requests in this state.' }}</td>
+          <td colspan="5" class="px-4 py-6 text-center text-sm text-slate-500">{{ loading() ? 'Loading leave dataâ€¦' : 'No leave requests in this state.' }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </section>
+

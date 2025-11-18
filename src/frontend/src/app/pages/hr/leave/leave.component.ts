@@ -57,4 +57,12 @@ export class HrLeaveComponent {
       error: (err) => this.error.set(err?.error?.message || 'Failed to reject request'),
     });
   }
+
+  formatType(type?: string | null) {
+    if (!type) {
+      return 'Unspecified';
+    }
+    const lower = type.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
 }
