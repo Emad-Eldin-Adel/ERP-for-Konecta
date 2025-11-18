@@ -33,8 +33,9 @@ jobs:
 
     - name: Build & Push Docker Images
       run: |
-        # Map microservices to ECR repos
+        # Map services to ECR repos
         declare -A MAP
+        MAP[frontend]="app1_repo"
         MAP[api-gateway]="app2_repo"
         MAP[auth-service]="app3_repo"
         MAP[config]="app4_repo"
@@ -44,7 +45,7 @@ jobs:
         MAP[inventory-service]="app8_repo"
         MAP[report-service]="app9_repo"
 
-        # Determine changed files safely
+        # Determine changed files
         if [ -z "${GITHUB_EVENT_BEFORE}" ] || [ "${GITHUB_EVENT_BEFORE}" = "0000000000000000000000000000000000000000" ]; then
           echo "⚪ First commit detected or new branch, building all Dockerfiles"
           CHANGED_FILES=$(git ls-files)
@@ -52,9 +53,14 @@ jobs:
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
         fi
 
-        # Loop over microservices
+        # Loop over all services
         for SERVICE in "${!MAP[@]}"; do
-          SERVICE_PATH="src/backend/$SERVICE"
+          if [ "$SERVICE" == "frontend" ]; then
+            SERVICE_PATH="src/frontend"
+          else
+            SERVICE_PATH="src/backend/$SERVICE"
+          fi
+
           DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
           REPO="${MAP[$SERVICE]}"
           IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO:latest"
@@ -65,14 +71,25 @@ jobs:
             continue
           fi
 
-          # Build & push only if Dockerfile changed
-          if echo "$CHANGED_FILES" | grep -q "^$DOCKERFILE_PATH$"; then
-            echo "🔵 Building service: $SERVICE → $IMAGE"
-            docker build -t $IMAGE "$SERVICE_PATH"
-
-            echo "🚀 Pushing $SERVICE to $REPO"
-            docker push $IMAGE
+          # Build & push frontend if any file changed in its folder
+          if [ "$SERVICE" == "frontend" ]; then
+            if echo "$CHANGED_FILES" | grep -q "^$SERVICE_PATH/"; then
+              echo "🔵 Building frontend → $IMAGE"
+              docker build -t $IMAGE "$SERVICE_PATH"
+              echo "🚀 Pushing frontend to $REPO"
+              docker push $IMAGE
+            else
+              echo "⚪ Skipping frontend (no changes)"
+            fi
           else
-            echo "⚪ Skipping $SERVICE (Dockerfile not changed)"
+            # Build & push backend service only if Dockerfile changed
+            if echo "$CHANGED_FILES" | grep -q "^$DOCKERFILE_PATH$"; then
+              echo "🔵 Building service: $SERVICE → $IMAGE"
+              docker build -t $IMAGE "$SERVICE_PATH"
+              echo "🚀 Pushing $SERVICE to $REPO"
+              docker push $IMAGE
+            else
+              echo "⚪ Skipping $SERVICE (Dockerfile not changed)"
+            fi
           fi
         done
