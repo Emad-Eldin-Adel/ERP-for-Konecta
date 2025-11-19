@@ -23,8 +23,8 @@ The backend is distributed across **Java Spring Boot** and **ASP.NET Core** micr
 | **Auth Service** | Spring Boot | JWT authentication, user and role management, RBAC. |
 | **Finance Service** | ASP.NET Core | Payroll, invoicing, and budget control. |
 | **HR Service** | Spring Boot | Employee management, attendance, and performance tracking. |
-| **Inventory Service** | ASP.NET Core | Product, supplier, and stock management. |
-| **Reporting Service** | Spring Boot | Dashboard data aggregation and export (PDF, Excel). |
+| **Inventory Service** | Spring Boot | Product, supplier, and stock management. |
+| **Report Service** | Spring Boot | Dashboard data aggregation and export (PDF, Excel). |
 | **Gateway Service** | Spring Boot | Central entry point (API Gateway). |
 | **Config Server** | Spring Boot | Centralized configuration management. |
 
