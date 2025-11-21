@@ -1,13 +1,13 @@
 <aside id="primary-navigation"
-    class="relative z-10 flex h-full w-full flex-col border-r border-slate-300 bg-slate-50 text-slate-700 transition-all duration-300"
+    class="relative z-10 flex h-full w-full flex-col border-r border-slate-200/80 bg-white/80 text-slate-800 shadow-[0_24px_48px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all duration-300"
     [attr.aria-expanded]="isOpen">
-    <div class="flex items-center justify-between gap-2 px-3 py-3 border-b border-slate-200 bg-white/70 backdrop-blur">
-        <div *ngIf="isOpen" class="flex items-center gap-2 text-sm font-semibold text-primary-700">
-            <span class="material-symbols-outlined text-[20px] text-primary-500">apps</span>
-            Navigation
+    <div class="flex items-center justify-between gap-2 border-b border-slate-200/70 bg-white/70 px-3 py-3">
+        <div *ngIf="isOpen" class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary-700">
+            <span class="material-symbols-outlined text-[18px] text-primary-500">apps</span>
+            Console
         </div>
         <button type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-primary-50 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-200"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-primary-200 hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-200"
             (click)="toggleSidebar()"
             aria-label="Toggle sidebar">
             <span class="material-symbols-outlined text-[20px]">
@@ -15,14 +15,14 @@
             </span>
         </button>
     </div>
-    <ul class="flex flex-1 flex-col gap-1 px-2 py-4 overflow-hidden min-h-full">
+    <ul class="flex min-h-full flex-1 flex-col gap-1 overflow-hidden px-2 py-4">
         <!-- Guaranteed Dashboard link at the very top -->
         <li *ngIf="dashPath as dp">
-            <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
-                [routerLink]="dp" routerLinkActive="bg-white text-slate-900 shadow-sm"
+            <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-700 transition hover:bg-primary-50 hover:text-primary-800"
+                [routerLink]="dp" routerLinkActive="bg-primary-50 text-primary-800 shadow-sm ring-1 ring-primary-100"
                 [routerLinkActiveOptions]="{ exact: true }">
                 <span
-                    class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                    class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm transition group-hover:bg-primary-100">
                     <span class="material-symbols-outlined text-[20px]">{{ materialIcon('space_dashboard') }}</span>
                 </span>
                 <span *ngIf="isOpen; else srOnlyDash" class="whitespace-nowrap text-sm font-medium">Dashboard</span>
@@ -32,11 +32,11 @@
         <li *ngFor="let item of visibleItems; let i = index">
             <!-- Parent with link (no children) -->
             <ng-container *ngIf="item.path && !item.children; else nonLinkItem">
-                <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
-                    [routerLink]="item.path" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-700 transition hover:bg-primary-50 hover:text-primary-800"
+                    [routerLink]="item.path" routerLinkActive="bg-primary-50 text-primary-800 shadow-sm ring-1 ring-primary-100"
                     [routerLinkActiveOptions]="{ exact: true }">
                     <span
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm transition group-hover:bg-primary-100">
                         <span class="material-symbols-outlined text-[20px]">
                             {{ materialIcon(item.icon) }}
                         </span>
@@ -49,11 +49,11 @@
             <!-- Non-link items: either placeholders or groups -->
             <ng-template #nonLinkItem>
                 <div class="flex items-center gap-2">
-                    <a class="group flex flex-1 items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900"
-                        [routerLink]="primaryPath(item)" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                    <a class="group flex flex-1 items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-700 transition hover:bg-primary-50 hover:text-primary-800"
+                        [routerLink]="primaryPath(item)" routerLinkActive="bg-primary-50 text-primary-800 shadow-sm ring-1 ring-primary-100"
                         [routerLinkActiveOptions]="{ exact: true }">
                         <span
-                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm transition group-hover:bg-white">
+                            class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm transition group-hover:bg-primary-100">
                             <span class="material-symbols-outlined text-[20px]">
                                 {{ materialIcon(item.icon) }}
                             </span>
@@ -63,7 +63,7 @@
                         <ng-template #srOnlyStatic><span class="sr-only">{{ item.label }}</span></ng-template>
                     </a>
                     <button *ngIf="item.children" type="button"
-                        class="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:text-primary-600"
+                        class="h-9 w-9 rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-primary-200 hover:text-primary-600"
                         (click)="toggleGroup(i)" [attr.aria-expanded]="isExpanded(i)">
                         <span class="material-symbols-outlined text-[20px]"
                             [ngClass]="{ '-rotate-180': isExpanded(i) }">expand_more</span>
@@ -74,11 +74,11 @@
                     [ngClass]="isOpen ? 'ml-11' : 'ml-2'">
                     <li *ngFor="let child of item.children">
                         <ng-container *ngIf="child.path; else nonLinkChild">
-                            <a class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900"
-                                [routerLink]="child.path" routerLinkActive="bg-white text-slate-900 shadow-sm"
+                            <a class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-800"
+                                [routerLink]="child.path" routerLinkActive="bg-primary-50 text-primary-800 shadow-sm ring-1 ring-primary-100"
                                 [routerLinkActiveOptions]="{ exact: true }">
                                 <span
-                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-slate-700 shadow-sm">
+                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm">
                                     <span class="material-symbols-outlined text-[18px]">{{ materialIcon(child.icon)
                                         }}</span>
                                 </span>
@@ -87,9 +87,9 @@
                         </ng-container>
                         <ng-template #nonLinkChild>
                             <button type="button"
-                                class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-600 transition hover:bg-white hover:text-slate-900">
+                                class="group flex w-full items-center gap-2 rounded-2xl px-2 py-1.5 text-[13px] font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-800">
                                 <span
-                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-white/70 text-slate-700 shadow-sm">
+                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm">
                                     <span class="material-symbols-outlined text-[18px]">{{ materialIcon(child.icon)
                                         }}</span>
                                 </span>

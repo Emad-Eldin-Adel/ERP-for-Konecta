@@ -1,18 +1,30 @@
-<div class="min-h-screen bg-gray-50">
-  <app-navbar class="fixed top-0 inset-x-0 z-50 block"></app-navbar>
+<div class="relative min-h-screen bg-canvas">
+  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_8%,rgba(99,102,241,0.12),transparent_35%),radial-gradient(circle_at_78%_10%,rgba(249,115,91,0.12),transparent_32%)]"></div>
+
+  <app-navbar class="fixed inset-x-0 top-0 z-50 block"></app-navbar>
   <app-sidebar
-    class="fixed left-0 top-[4.5rem] h-[calc(100vh-4.5rem)] bg-white border-r border-slate-200 z-40 shadow-sm transition-all"
-    [ngClass]="isSidebarOpen ? 'w-56' : 'w-16'"
+    class="fixed left-0 top-[5.5rem] z-40 h-[calc(100vh-5.5rem)] border-r border-white/60 bg-white/80 text-slate-800 shadow-[0_18px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all"
+    [ngClass]="isSidebarOpen ? 'w-60' : 'w-16'"
     [isOpen]="isSidebarOpen"
     (isOpenChange)="onSidebarState($event)"></app-sidebar>
 
   <main
-    class="flex-1 bg-gray-50 overflow-y-auto transition-all min-h-screen pt-[4.5rem]"
-    [ngClass]="isSidebarOpen ? 'ml-56' : 'ml-16'">
-    <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
+    class="flex-1 min-h-screen overflow-y-auto pt-[6rem] transition-all"
+    [ngClass]="isSidebarOpen ? 'ml-60' : 'ml-16'">
+    <div class="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 lg:px-8">
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <a
+    href="https://konecta-erp-chatbot-xbqmaly2xz8nfwe74kqc9r.streamlit.app/"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fixed bottom-6 right-6 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-[0_14px_40px_rgba(99,102,241,0.35)] transition hover:translate-y-[-2px] hover:shadow-[0_18px_50px_rgba(99,102,241,0.4)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300"
+    aria-label="Open Konecta chat"
+  >
+    <span class="text-lg font-black tracking-wide">AI</span>
+  </a>
 
   <app-footer></app-footer>
 </div>
