@@ -55,7 +55,7 @@ A unified **Angular** dashboard serves as the interface for all ERP modules.
 | **Frontend** | Angular 18, TypeScript, PrimeNG |
 | **Backend (Java)** | Spring Boot 3, Maven, JPA/Hibernate |
 | **Backend (.NET)** | ASP.NET Core 8, Entity Framework Core |
-| **Database** | MySQL / MariaDB |
+| **Database** | MySQL / postgresql |
 | **Communication** | REST APIs |
 | **Security** | JWT Authentication, RBAC, Circuit Breaker, HTTPS |
 | **Resilience** | Retry, Fallback, Bulkhead via Resilience4j & Polly |
