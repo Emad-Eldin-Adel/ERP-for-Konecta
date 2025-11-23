@@ -10,6 +10,9 @@ app:
     phone: "+10000000000"
     email: admin@konecta.com
     password: ChangeMe123!
+  cors:
+    allowed-origins: "*"
+    allowed-origin-patterns: "*"
 
 spring:
   application:

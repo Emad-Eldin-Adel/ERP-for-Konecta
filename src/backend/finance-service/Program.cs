@@ -15,9 +15,22 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
+const string CorsPolicyName = "AllowAll";
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        policy
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("FinanceDb")
     ?? builder.Configuration["Database:ConnectionString"];
@@ -111,6 +124,7 @@ if (app.Environment.IsDevelopment())
 	app.UseHttpsRedirection();
 }
 
+app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 
