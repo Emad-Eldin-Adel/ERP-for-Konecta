@@ -171,4 +171,22 @@
       </table>
     </div>
   </article>
+
+  <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Finance dashboards</h2>
+        <p class="text-sm text-slate-500">Embedded Power BI view.</p>
+      </div>
+    </header>
+    <div class="mt-4 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200">
+      <iframe
+        [src]="powerBiUrl"
+        class="h-full w-full"
+        title="Finance Power BI"
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </article>
 </section>

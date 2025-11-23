@@ -15,7 +15,7 @@
             </span>
         </button>
     </div>
-    <ul class="flex min-h-full flex-1 flex-col gap-1 overflow-hidden px-2 py-4">
+    <ul class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 py-4">
         <!-- Guaranteed Dashboard link at the very top -->
         <li *ngIf="dashPath as dp">
             <a class="group flex items-center gap-2.5 rounded-2xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-700 transition hover:bg-primary-50 hover:text-primary-800"
@@ -25,8 +25,8 @@
                     class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-50 text-primary-600 shadow-sm transition group-hover:bg-primary-100">
                     <span class="material-symbols-outlined text-[20px]">{{ materialIcon('space_dashboard') }}</span>
                 </span>
-                <span *ngIf="isOpen; else srOnlyDash" class="whitespace-nowrap text-sm font-medium">Dashboard</span>
-                <ng-template #srOnlyDash><span class="sr-only">Dashboard</span></ng-template>
+                <span *ngIf="isOpen; else srOnlyDash" class="whitespace-nowrap text-sm font-medium">Home</span>
+                <ng-template #srOnlyDash><span class="sr-only">Home</span></ng-template>
             </a>
         </li>
         <li *ngFor="let item of visibleItems; let i = index">

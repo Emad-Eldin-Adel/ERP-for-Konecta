@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FinanceExpense, FinanceInvoice, FinanceService, PayrollOverviewRow } from '../../../core/services/finance.service';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-finance-overview',
@@ -12,6 +13,7 @@ import { forkJoin } from 'rxjs';
 })
 export class FinanceOverviewComponent implements OnInit {
   private finance = inject(FinanceService);
+  private sanitizer = inject(DomSanitizer);
 
   expenses = signal<FinanceExpense[]>([]);
   invoices = signal<FinanceInvoice[]>([]);
@@ -20,6 +22,9 @@ export class FinanceOverviewComponent implements OnInit {
   payrollLoading = signal(false);
   error = signal('');
   period = signal(this.getCurrentPeriod());
+  powerBiUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+    'https://app.powerbi.com/reportEmbed?reportId=e60d1ad1-c507-469e-b3d4-a96948ed8505&autoAuth=true&ctid=6845d6ca-1ec5-4c0e-9e9d-34130ce0a0b8'
+  );
 
   summary = computed(() => {
     const expenses = this.expenses();
