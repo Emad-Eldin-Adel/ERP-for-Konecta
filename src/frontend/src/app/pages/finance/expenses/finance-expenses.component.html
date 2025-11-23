@@ -64,6 +64,9 @@
     </button>
   </div>
 
+  <div *ngIf="actionMessage()" class="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-emerald-700">
+    {{ actionMessage() }}
+  </div>
   <div *ngIf="error()" class="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-700">
     {{ error() }}
   </div>

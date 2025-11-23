@@ -31,6 +31,7 @@ export class FinanceExpensesComponent implements OnInit {
   showImport = signal(false);
   importing = signal(false);
   importError = signal('');
+  actionMessage = signal('');
   importSummary = signal<ImportSummary | null>(null);
   importFile = signal<File | null>(null);
   importStatus = signal<ExpenseStatus>('APPROVED');
@@ -107,6 +108,7 @@ export class FinanceExpensesComponent implements OnInit {
       next: (data) => {
         this.expenses.set(data);
         this.error.set('');
+        this.actionMessage.set('');
         this.page.set(1);
       },
       error: (err) => {
@@ -163,26 +165,24 @@ export class FinanceExpensesComponent implements OnInit {
   }
 
   approve(expense: FinanceExpense) {
-    if (!confirm(`Approve ${expense.category || 'expense'} for ${this.formatCurrency(expense.amount)}?`)) {
-      return;
-    }
     const approverId = this.auth.currentUser?.id ?? 0;
+    this.actionMessage.set('');
     this.finance.approveExpense(expense.id, approverId).subscribe({
       next: (updated) => {
         this.expenses.update((list) => list.map((item) => (item.id === updated.id ? updated : item)));
+        this.actionMessage.set(`${updated.category || 'Expense'} approved.`);
       },
       error: (err) => (this.error.set(err?.error?.message || 'Unable to approve expense.')),
     });
   }
 
   reject(expense: FinanceExpense) {
-    if (!confirm(`Reject ${expense.category || 'expense'}?`)) {
-      return;
-    }
     const approverId = this.auth.currentUser?.id ?? 0;
+    this.actionMessage.set('');
     this.finance.rejectExpense(expense.id, approverId).subscribe({
       next: (updated) => {
         this.expenses.update((list) => list.map((item) => (item.id === updated.id ? updated : item)));
+        this.actionMessage.set(`${updated.category || 'Expense'} rejected.`);
       },
       error: (err) => (this.error.set(err?.error?.message || 'Unable to reject expense.')),
     });
