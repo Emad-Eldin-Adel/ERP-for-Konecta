@@ -28,10 +28,16 @@ public class GatewayCorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         List<String> origins = parseList(allowedOrigins);
-        if (!origins.isEmpty()) {
+        boolean hasWildcardOrigin = origins.contains(CorsConfiguration.ALL);
+        // When allowCredentials is true, Spring ignores "*" in allowedOrigins.
+        // Prefer patterns for wildcard scenarios.
+        if (!origins.isEmpty() && !hasWildcardOrigin) {
             config.setAllowedOrigins(origins);
         }
         List<String> patterns = parseList(allowedOriginPatterns);
+        if (patterns.isEmpty() && hasWildcardOrigin) {
+            patterns = List.of(CorsConfiguration.ALL);
+        }
         if (!patterns.isEmpty()) {
             config.setAllowedOriginPatterns(patterns);
         }
