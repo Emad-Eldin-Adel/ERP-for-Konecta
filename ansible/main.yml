@@ -1,0 +1,60 @@
+name: Deploy to EC2 (build on host)
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo (for action context)
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+
+      - name: Pull, build and restart app on remote host
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+            set -e
+
+            # Where the repo lives on server:
+            CODE_DIR="../ERP-for-Konecta"
+
+            # Ensure we are up to date
+            if [ -d "$CODE_DIR/.git" ]; then
+              cd "$CODE_DIR"
+              git fetch --all
+              git reset --hard origin/production
+            else
+              git clone --branch production https://github.com/Emad-Eldin-Adel/ERP-for-Konecta.git "$CODE_DIR"
+              cd "$CODE_DIR"
+            fi
+
+            # Build docker image on remote host
+            sudo docker build -t erp_backend:latest "$CODE_DIR"
+
+            # Stop and remove old container if exists
+            if sudo docker ps -a --format '{{"{{.Names}}"}}' | grep -q "^erp_backend$"; then
+              sudo docker stop erp_backend || true
+              sudo docker rm erp_backend || true
+            fi
+
+            # Run container
+            sudo docker run -d --name erp_backend -p 80:8080 --restart always erp_backend:latest
+
+            echo "Deployment finished."
+          EOF
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
