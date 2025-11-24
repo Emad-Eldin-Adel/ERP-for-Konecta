@@ -42,7 +42,7 @@ const NAV_ITEMS = [
           </nav>
           <a
             *ngIf="isEmployeesSection()"
-            href="https://konecta-hr-attrition-mghuazw9grjizwkgzqv57n.streamlit.app/"
+            href="https://hrattritionmodeldeploy-j8jw5deuglrvlpas4hgmbq.streamlit.app/"
             target="_blank"
             rel="noopener"
             class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700"
