@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { label: 'People', path: '/hr/employees', icon: 'group' },
   { label: 'Departments', path: '/hr/departments', icon: 'business' },
   { label: 'Jobs', path: '/hr/jobs', icon: 'work' },
+  { label: 'ATS', path: '/hr/ats', icon: 'rocket_launch' },
   { label: 'Leave', path: '/hr/leave', icon: 'event_available' },
   { label: 'Attendance', path: '/hr/attendance', icon: 'calendar_month' },
   { label: 'Performance', path: '/hr/performance', icon: 'workspace_premium' },
