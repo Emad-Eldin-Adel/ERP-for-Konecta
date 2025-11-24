@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgClass, NgFor } from '@angular/common';
 
 const NAV_ITEMS = [
@@ -27,18 +27,30 @@ const NAV_ITEMS = [
             <p class="text-sm text-slate-500">Manage people programs, compliance, and growth initiatives.</p>
           </div>
         </div>
-        <nav class="mt-4 flex flex-wrap gap-2 text-sm font-semibold text-slate-500">
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <nav class="flex flex-wrap gap-2 text-sm font-semibold text-slate-500">
+            <a
+              *ngFor="let item of nav"
+              [routerLink]="item.path"
+              routerLinkActive="bg-primary-100 text-primary-700 shadow-lg shadow-primary-500/30 border border-primary-200"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-primary-200 hover:text-primary-600"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
+              {{ item.label }}
+            </a>
+          </nav>
           <a
-            *ngFor="let item of nav"
-            [routerLink]="item.path"
-            routerLinkActive="bg-primary-100 text-primary-700 shadow-lg shadow-primary-500/30 border border-primary-200"
-            class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 transition hover:border-primary-200 hover:text-primary-600"
-            [routerLinkActiveOptions]="{ exact: true }"
+            *ngIf="isEmployeesSection()"
+            href="https://konecta-hr-attrition-mghuazw9grjizwkgzqv57n.streamlit.app/"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-700"
           >
-            <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
-            {{ item.label }}
+            <span class="material-symbols-outlined text-base">trending_up</span>
+            Employees retention
           </a>
-        </nav>
+        </div>
       </header>
       <router-outlet></router-outlet>
     </section>
@@ -46,5 +58,10 @@ const NAV_ITEMS = [
   imports: [RouterOutlet, RouterLink, RouterLinkActive, NgFor, NgClass],
 })
 export class HrShellComponent {
+  private router = inject(Router);
   nav = NAV_ITEMS;
+
+  isEmployeesSection() {
+    return this.router.url.startsWith('/hr/employees');
+  }
 }
