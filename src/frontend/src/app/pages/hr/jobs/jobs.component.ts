@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HrJob, HrJobRequest, HrJobService, JobStatus } from '../../../core/services/hr-job.service';
 import { HrDepartmentService, HrDepartment } from '../../../core/services/hr-department.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-hr-jobs',
@@ -14,6 +15,7 @@ export class HrJobsComponent implements OnInit {
   private jobService = inject(HrJobService);
   private departmentService = inject(HrDepartmentService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   jobs = signal<HrJob[]>([]);
   departments = signal<HrDepartment[]>([]);
@@ -98,5 +100,9 @@ export class HrJobsComponent implements OnInit {
       next: () => this.jobs.update((items) => items.filter((j) => j.id !== job.id)),
       error: (err) => this.error.set(err?.error?.message || 'Failed to delete job'),
     });
+  }
+
+  openAtsPlaceholder() {
+    this.router.navigate(['/hr/ats']);
   }
 }

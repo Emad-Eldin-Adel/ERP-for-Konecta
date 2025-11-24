@@ -27,6 +27,7 @@ import { InventoryItemsComponent } from './pages/inventory/items/inventory-items
 import { InventoryWarehousesComponent } from './pages/inventory/warehouses/inventory-warehouses.component';
 import { InventoryLevelsComponent } from './pages/inventory/levels/inventory-levels.component';
 import { InventoryMovementsComponent } from './pages/inventory/movements/inventory-movements.component';
+import { AtsPlaceholderComponent } from './pages/hr/ats/ats-placeholder.component';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,7 @@ export const routes: Routes = [
           { path: 'employees', component: HrEmployeeDashboardComponent },
           { path: 'departments', component: HrDepartmentsComponent },
           { path: 'jobs', component: HrJobsComponent },
+          { path: 'ats', component: AtsPlaceholderComponent },
           { path: 'leave', component: HrLeaveComponent },
           { path: 'attendance', component: HrAttendanceComponent },
           { path: 'performance', component: HrPerformanceComponent },

@@ -25,6 +25,13 @@ const NAV_ITEMS = [
               Monitor cash flow, approve spending, and keep billing current.
             </p>
           </div>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 shadow-inner shadow-primary-200/60 transition hover:bg-primary-100"
+          >
+            <span class="material-symbols-outlined text-base">auto_awesome</span>
+            AI-powered Financial Forecasting
+          </button>
         </div>
         <nav class="mt-4 flex flex-wrap gap-2 text-sm font-semibold text-slate-500">
           <a

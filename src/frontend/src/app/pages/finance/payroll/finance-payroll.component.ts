@@ -275,7 +275,8 @@ export class FinancePayrollComponent implements OnInit {
     if (!lines.length) {
       return { updated: 0, skipped: 0 };
     }
-    const headerCells = this.parseCsvLine(lines.shift()!);
+    const headerLine = this.stripBom(lines.shift()!);
+    const headerCells = this.parseCsvLine(headerLine);
     const headers = headerCells.map((cell) => cell.replace(/\s+/g, '').toLowerCase());
     const idIdx = this.findHeader(headers, 'employeeid', 'id');
     const nameIdx = this.findHeader(headers, 'name', 'employee');
@@ -305,24 +306,20 @@ export class FinancePayrollComponent implements OnInit {
         continue;
       }
 
-      const base = baseIdx >= 0 ? Number(getCell(baseIdx)) : undefined;
-      const bonus = bonusIdx >= 0 ? Number(getCell(bonusIdx)) : undefined;
-      const deduction = deductionIdx >= 0 ? Number(getCell(deductionIdx)) : undefined;
+      const base = baseIdx >= 0 ? this.parseAmount(getCell(baseIdx)) : null;
+      const bonus = bonusIdx >= 0 ? this.parseAmount(getCell(bonusIdx)) : null;
+      const deduction = deductionIdx >= 0 ? this.parseAmount(getCell(deductionIdx)) : null;
 
-      if (
-        [base, bonus, deduction].every(
-          (value) => value === undefined || Number.isNaN(value)
-        )
-      ) {
+      if ([base, bonus, deduction].every((value) => value === null)) {
         skipped++;
         continue;
       }
 
       this.updateRow(employeeId, (row) => {
         const updatedRow: PayrollRow = { ...row };
-        if (base !== undefined && !Number.isNaN(base)) updatedRow.base = base;
-        if (bonus !== undefined && !Number.isNaN(bonus)) updatedRow.bonuses = bonus;
-        if (deduction !== undefined && !Number.isNaN(deduction)) {
+        if (base !== null) updatedRow.base = base;
+        if (bonus !== null) updatedRow.bonuses = bonus;
+        if (deduction !== null) {
           updatedRow.deductions = deduction;
         }
         updatedRow.net = this.calcNet(updatedRow.base, updatedRow.bonuses, updatedRow.deductions);
@@ -334,6 +331,21 @@ export class FinancePayrollComponent implements OnInit {
     }
 
     return { updated, skipped };
+  }
+
+  private parseAmount(raw: string | undefined | null) {
+    if (!raw) return null;
+    const cleaned = raw
+      .replace(/[\u00a0\s]/g, '')
+      .replace(/[$,]/g, '')
+      .replace(/^\((.*)\)$/, '-$1');
+    if (!cleaned.length) return null;
+    const value = Number(cleaned);
+    return Number.isFinite(value) ? value : null;
+  }
+
+  private stripBom(value: string) {
+    return value.replace(/^\uFEFF/, '');
   }
 
   private parseCsvLine(line: string) {

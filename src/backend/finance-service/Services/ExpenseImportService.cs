@@ -56,7 +56,7 @@ public class ExpenseImportService(FinanceDbContext dbContext) : IExpenseImportSe
         if (headerRow == null) return summary;
 
         var headers = headerRow.Cells().ToDictionary(c => c.GetString().Trim().ToLowerInvariant(), c => c.Address.ColumnNumber);
-        var monthCol = Require(headers, ["month", "date"]);
+        var monthCol = Require(headers, ["month", "date", "expense date", "expense_date"]);
         var deptCol = Require(headers, ["department"]);
         var categoryCol = Require(headers, ["expense type", "category", "type"]);
         var amountCol = Require(headers, ["amount", "value"]);
@@ -108,7 +108,7 @@ public class ExpenseImportService(FinanceDbContext dbContext) : IExpenseImportSe
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
         var header = csvReader.HeaderRecord?.Select(h => h.Trim().ToLowerInvariant()).ToArray() ?? Array.Empty<string>();
-        var monthIndex = Require(header, ["month", "date"]);
+        var monthIndex = Require(header, ["month", "date", "expense date", "expense_date"]);
         var deptIndex = Require(header, ["department"]);
         var categoryIndex = Require(header, ["expense type", "category", "type"]);
         var amountIndex = Require(header, ["amount", "value"]);

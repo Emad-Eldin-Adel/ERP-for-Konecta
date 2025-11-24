@@ -4,9 +4,22 @@
       <h2 class="text-xl font-semibold text-slate-900">Job Openings</h2>
       <p class="text-sm text-slate-500">Track requisitions and hiring status.</p>
     </div>
-    <button class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700" (click)="startCreate()">
-      + New requisition
-    </button>
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        class="inline-flex items-center gap-2 rounded-xl border border-primary-200 px-4 py-2 text-sm font-semibold text-primary-700 bg-primary-50 shadow-sm hover:border-primary-300 hover:bg-primary-100"
+        (click)="openAtsPlaceholder()"
+        type="button"
+      >
+        <span class="material-symbols-outlined text-base">radar</span>
+        ATS runway
+      </button>
+      <button
+        class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+        (click)="startCreate()"
+      >
+        + New requisition
+      </button>
+    </div>
   </header>
 
   <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">

@@ -95,6 +95,14 @@
         />
       </label>
 
+      <button
+        *ngIf="role && role !== 'EMPLOYEE'"
+        type="button"
+        class="hidden items-center rounded-full border border-primary-200 bg-white/80 px-4 py-2 text-sm font-semibold text-primary-700 shadow-inner transition hover:bg-primary-50 sm:inline-flex"
+      >
+        Automated Document Processing
+      </button>
+
       <div class="relative">
         <button *ngIf="role; else guestActions"
           type="button"
