@@ -6,6 +6,12 @@ The Full Stack team is responsible for designing and building the **core archite
 
 ---
 
+## Deployment
+
+Access the deployed ERP instance here: [Konecta ERP Deployment](http://konecta-1056300237.eu-central-1.elb.amazonaws.com/).
+
+---
+
 ## 🧭 Project Overview
 
 **Konecta ERP** is an enterprise-grade system that unifies Konecta’s core functions — Finance, HR, Operations, Sales, IT, and Analytics — into one cloud-based platform.  
@@ -59,5 +65,3 @@ A unified **Angular** dashboard serves as the interface for all ERP modules.
 | **Communication** | REST APIs |
 | **Security** | JWT Authentication, RBAC, Circuit Breaker, HTTPS |
 | **Resilience** | Retry, Fallback, Bulkhead via Resilience4j & Polly |
-
-
