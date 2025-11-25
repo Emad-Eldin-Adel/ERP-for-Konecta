@@ -14,14 +14,13 @@
         [ngClass]="brandOn ? 'text-primary-800' : 'text-primary-700'"
         aria-label="Konecta One home link"
       >
-        <span class="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
-          <span class="absolute inset-0 bg-gradient-to-br from-primary-100 via-primary-400 to-primary-700"></span>
-          <span class="absolute inset-0 opacity-60">
-            <span class="absolute inset-[-40%] rounded-full bg-primary-200/60 blur-2xl"></span>
-            <span class="absolute left-[5%] top-[-30%] h-16 w-16 rounded-full bg-accent-yellow/40 blur-3xl"></span>
-          </span>
-          <span class="relative text-xl font-black tracking-tight text-white">KO</span>
-        </span>
+        <img
+          src="/user-network-logo.svg"
+          alt="Konecta network logo"
+          class="h-12 w-12 rounded-2xl border border-accent-yellow/30 bg-white p-2 shadow-inner ring-1 ring-primary-100"
+          loading="lazy"
+          draggable="false"
+        />
         <span class="flex flex-col leading-tight text-left">
           <span class="text-sm font-semibold uppercase tracking-[0.18em] text-primary-600">Konecta</span>
           <span class="text-xl font-black text-slate-900">One</span>
@@ -95,13 +94,15 @@
         />
       </label>
 
-      <button
+      <a
         *ngIf="role && role !== 'EMPLOYEE'"
-        type="button"
+        href="https://konectadocumentsystem-nngw9z57s9b3nzdtyqfrzg.streamlit.app/"
+        target="_blank"
+        rel="noopener noreferrer"
         class="hidden items-center rounded-full border border-primary-200 bg-white/80 px-4 py-2 text-sm font-semibold text-primary-700 shadow-inner transition hover:bg-primary-50 sm:inline-flex"
       >
         Automated Document Processing
-      </button>
+      </a>
 
       <div class="relative">
         <button *ngIf="role; else guestActions"
